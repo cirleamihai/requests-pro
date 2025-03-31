@@ -8,25 +8,6 @@ from errors.antibot.antiBotErrors import AntiBotSolverError
 
 from websites.headerHelper import HeaderHelper
 
-
-def is_ip_port_taken(host='127.0.0.1', port=8888, timeout=0.01):
-    """Check if Charles Proxy is running by attempting to connect to the given host and port."""
-    try:
-        with socket.create_connection((host, port), timeout=timeout):
-            return True
-    except (socket.timeout, ConnectionRefusedError, OSError):
-        return False
-
-
-def get_random_available_port(start=1024, end=49151) -> int:
-    """
-    Get a random available port on the machine.
-    """
-    while True:
-        port = random.randint(start, end)
-        if not is_ip_port_taken(port=port):
-            return port
-
 # noinspection PyProtectedMember
 class Client(ABC):
     """Interface for the client session classes."""

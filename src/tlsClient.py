@@ -2,10 +2,12 @@ import uuid
 
 from tls_client import Session as tlsClient
 
-from httpSessions.clientSession import ClientSession, is_ip_port_taken
+from httpSessions.clientSession import ClientSession
 from urllib.parse import quote
 
 from websites.headerHelper import HeaderHelper
+
+from src.utils.httpsUtils import is_charles_running
 
 
 # noinspection PyTypeChecker
@@ -57,7 +59,7 @@ class TLSClientSession(ClientSession):
             if 'verify' in kwargs:
                 kwargs['insecure_skip_verify'] = not kwargs.pop('verify')
 
-                if is_ip_port_taken():
+                if is_charles_running():
                     kwargs['proxy'] = {
                         "http": "http://127.0.0.1:8888",
                         "https": "http://127.0.0.1:8888",
