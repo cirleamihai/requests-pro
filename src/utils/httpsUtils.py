@@ -2,8 +2,11 @@ import socket
 import random
 
 CHARLES_CONFIGURATION = ('127.0.0.1', 8888, 0.01)
+
+
 def is_charles_running():
     return is_ip_port_taken(*CHARLES_CONFIGURATION)
+
 
 def is_ip_port_taken(host, port, timeout=0.01):
     """Check if Charles Proxy is running by attempting to connect to the given host and port."""
