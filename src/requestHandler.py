@@ -3,16 +3,18 @@ from http.cookies import SimpleCookie
 import requests
 from typing import Callable
 
+from requests import HTTPError, RequestException
 from tls_client.exceptions import TLSClientExeption
 
-from httpSessions.clientSession import ClientSession
-from errors.sessionErrors import *
+from src.abstractClient import Client
 import urllib3
+
+from src.errors.httpErrors import UnauthorizedError, AntiBotBlockError, NotFoundError
 
 urllib3.disable_warnings()
 
 
-class RequestHandler(ClientSession):
+class RequestHandler(Client):
     """
     Wraps the client session and adds error handling to the requests.
 
@@ -20,7 +22,7 @@ class RequestHandler(ClientSession):
     """
 
     # noinspection PyMissingConstructor
-    def __init__(self, session: ClientSession, **kwargs):
+    def __init__(self, session: Client, **kwargs):
         self.session = session
         self.logger = kwargs['logger']
 
@@ -45,15 +47,28 @@ class RequestHandler(ClientSession):
 
         if response.status_code != 200:
             if response.status_code == 421 or 400 > response.status_code >= 300:
-                return
+                return  # Ignore these status codes
+
             elif response.status_code == 403:
-                raise AntiBotBlockError(f"Blocked by AntiBot [{response.status_code}]")
+                raise AntiBotBlockError(
+                    message=f"Blocked by AntiBot",
+                    response_str=response.text,
+                    response_obj=response
+                )
 
             elif response.status_code == 401:
-                raise UnauthorizedError(f"Unauthorized [{response.status_code}]", response.text, response)
+                raise UnauthorizedError(
+                    message=f"Unauthorized",
+                    response_str=response.text,
+                    response_obj=response
+                )
 
             elif response.status_code == 404:
-                raise NotFoundError(f"Page not found [{response.status_code}]", response.text, response)
+                raise NotFoundError(
+                    message=f"Page not found",
+                    response_str=response.text,
+                    response_obj=response
+                )
 
             raise requests.exceptions.HTTPError(f"Response status code is not 200 [{response.status_code}]")
 
