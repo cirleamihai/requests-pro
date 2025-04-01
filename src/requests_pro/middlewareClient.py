@@ -1,3 +1,4 @@
+import functools
 from abc import ABC
 from http.cookies import SimpleCookie
 from typing import Callable
@@ -7,8 +8,8 @@ import urllib3
 from requests import HTTPError, RequestException
 from tls_client.exceptions import TLSClientExeption
 
-from .abstractClient import Client
-from .errors.httpErrors import (AntiBotBlockError, NotFoundError,
+from abstractClient import Client
+from errors.httpErrors import (AntiBotBlockError, NotFoundError,
                                 RequestsGroupedError, UnauthorizedError)
 
 urllib3.disable_warnings()
@@ -22,7 +23,7 @@ def request_through_middleware(func):
     :param func: an object's instance that inherits from the MiddlewareClient class
     :return: a function that calls the _make_request function
     """
-
+    @functools.wraps(func)
     def wrapper(self, url: str, *args, **kwargs) -> Callable:
         if kwargs.get("no_middleware"):
             del kwargs["no_middleware"]
@@ -111,8 +112,6 @@ class MiddlewareClient(Client, ABC):
             else:
                 kwargs['statuses_to_skip'] = [str(status) for status in statuses_to_skip]
 
-        del kwargs['method_type']
-
     @staticmethod
     def _check_for_redirects(response, url: str):
         redirected = False
@@ -170,7 +169,7 @@ class MiddlewareClient(Client, ABC):
 
         while retries < max_retries:
             try:
-                response = request_method(url, **kwargs)
+                response = request_method(self, url, **kwargs)
                 self._set_cookies(response)
 
                 # Check for redirects

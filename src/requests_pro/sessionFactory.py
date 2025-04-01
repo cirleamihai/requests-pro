@@ -1,8 +1,8 @@
-from .abstractClient import Client
-from .requestsClient import RequestsClient
-from .tlsClient import TLSClient
-from .utils.headerTools import HeaderHelper
-from .utils.proxiesHandler import ProxiesHandler
+from abstractClient import Client
+from requestsClient import RequestsClient
+from tlsClient import TLSClient
+from utils.headerTools import HeaderHelper
+from utils.proxiesHandler import ProxiesHandler
 
 
 class SessionFactory:

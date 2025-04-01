@@ -1,11 +1,13 @@
 import uuid
+from typing import Optional, Dict, List
 from urllib.parse import quote
 
 from tls_client import Session as tlsClient
+from tls_client.settings import ClientIdentifiers
 
-from .middlewareClient import MiddlewareClient, request_through_middleware
-from .utils.headerTools import HeaderHelper
-from .utils.httpsUtils import is_charles_running
+from middlewareClient import MiddlewareClient, request_through_middleware
+from utils.headerTools import HeaderHelper
+from utils.httpsUtils import is_charles_running
 
 
 def kwargs_processing(func):
@@ -45,12 +47,30 @@ class TLSClient(MiddlewareClient):
     Provides cookie persistence, connection-pooling, configuration and most importantly,
         low level details that can be configured with the underlying tls_client library.
     """
+
     def __init__(
             self,
             proxies: dict = None,
             headers: dict = None,
             header_helper: HeaderHelper = None,
-            client_identifier: str = "chrome_120",
+            client_identifier: ClientIdentifiers = "chrome_120",
+            ja3_string: Optional[str] = None,
+            h2_settings: Optional[Dict[str, int]] = None,
+            h2_settings_order: Optional[List[str]] = None,
+            supported_signature_algorithms: Optional[List[str]] = None,
+            supported_delegated_credentials_algorithms: Optional[List[str]] = None,
+            supported_versions: Optional[List[str]] = None,
+            key_share_curves: Optional[List[str]] = None,
+            cert_compression_algo: str = None,
+            additional_decode: str = None,
+            pseudo_header_order: Optional[List[str]] = None,
+            connection_flow: Optional[int] = None,
+            priority_frames: Optional[list] = None,
+            header_priority: Optional[List[str]] = None,
+            force_http1: Optional = False,
+            catch_panics: Optional = False,
+            debug: Optional = False,
+            certificate_pinning: Optional[Dict[str, List[str]]] = None,
     ):
         """
         Currently using this tls client as a wrapper around the requests library:
@@ -66,10 +86,29 @@ class TLSClient(MiddlewareClient):
         self.header_helper: HeaderHelper = header_helper or HeaderHelper()
         self.header_order = self.header_helper.get_header_order()
 
-        self.session = tlsClient(self.client_identifier,
-                                 random_tls_extension_order=True,
-                                 header_order=self.header_order,
-                                 )
+        self.session = tlsClient(
+            client_identifier=self.client_identifier,
+            random_tls_extension_order=True,
+            header_order=self.header_order,
+            # Additional parameters that can be passed to the tls client
+            ja3_string=ja3_string,
+            h2_settings=h2_settings,
+            h2_settings_order=h2_settings_order,
+            supported_signature_algorithms=supported_signature_algorithms,
+            supported_delegated_credentials_algorithms=supported_delegated_credentials_algorithms,
+            supported_versions=supported_versions,
+            key_share_curves=key_share_curves,
+            cert_compression_algo=cert_compression_algo,
+            additional_decode=additional_decode,
+            pseudo_header_order=pseudo_header_order,
+            connection_flow=connection_flow,
+            priority_frames=priority_frames,
+            header_priority=header_priority,
+            force_http1=force_http1,
+            catch_panics=catch_panics,
+            debug=debug,
+            certificate_pinning=certificate_pinning,
+        )
 
         if proxies:
             self.proxies = proxies
