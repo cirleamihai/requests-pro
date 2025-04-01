@@ -22,3 +22,21 @@ class AntiBotBlockError(HttpError):
 
 class UnauthorizedError(HttpError):
     pass
+
+
+class GroupedError(ExceptionGroup):
+    def __new__(cls, message: str, errors: list[Exception]):
+        return super().__new__(cls, message, errors)
+
+    def __str__(self):
+        message = f"{self.args[0]}\n"
+        for index, error in enumerate(self.exceptions):
+            message += f"{index}. [{error.__class__.__name__}]: {error}\n"
+        return message
+
+    def get_last_error(self):
+        return self.exceptions[-1] if self.exceptions else None  # Avoid indexing error
+
+
+class RequestsGroupedError(GroupedError):
+    pass

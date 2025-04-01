@@ -1,6 +1,6 @@
 from requests import Session
 
-from src.abstractClient import Client
+from src.middlewareClient import MiddlewareClient
 from src.utils.headerTools import HeaderHelper
 
 from src.utils.httpsUtils import is_charles_running
@@ -28,7 +28,7 @@ def kwargs_processing(func):
     return wrapper
 
 
-class RequestsClient(Client):
+class RequestsClient(MiddlewareClient):
     """
     Concrete implementation of the Client interface using the requests library Session feature.
     """

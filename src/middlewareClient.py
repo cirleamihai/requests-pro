@@ -1,3 +1,4 @@
+from abc import ABC
 from http.cookies import SimpleCookie
 
 import requests
@@ -9,22 +10,17 @@ from tls_client.exceptions import TLSClientExeption
 from src.abstractClient import Client
 import urllib3
 
-from src.errors.httpErrors import UnauthorizedError, AntiBotBlockError, NotFoundError
+from src.errors.httpErrors import UnauthorizedError, AntiBotBlockError, NotFoundError, RequestsGroupedError
 
 urllib3.disable_warnings()
 
 
-class RequestHandler(Client):
+class MiddlewareClient(Client, ABC):
     """
     Wraps the client session and adds error handling to the requests.
 
     Inherits from the Client class in order to be able to use the same interface.
     """
-
-    # noinspection PyMissingConstructor
-    def __init__(self, session: Client):
-        self.session = session
-
     @staticmethod
     def check_response_status(response: requests.Response, custom_status_handling_function: Callable = None,
                               statuses_to_skip: list = None):
@@ -152,10 +148,6 @@ class RequestHandler(Client):
         statuses_to_skip = kwargs.pop("statuses_to_skip", [])
 
         while retries < max_retries:
-            # if there are any errors, make sure to signal them
-            if errors:
-                self.logger.error(errors[-1])
-
             try:
                 response = request_method(url, **kwargs)
                 self._set_cookies(response)
@@ -193,95 +185,6 @@ class RequestHandler(Client):
                 retries += 1
                 errors.append(RequestException(message))
 
-        raise ExceptionGroup(f"Failed to make the request in {max_retries} tries", errors)
-
-    def request(self, method: str, url: str, **kwargs):
-        if method == "GET":
-            return self.get(url, **kwargs)
-        elif method == "POST":
-            return self.post(url, **kwargs)
-        elif method == "PUT":
-            return self.put(url, **kwargs)
-        elif method == "DELETE":
-            return self.delete(url, **kwargs)
-        elif method == "OPTIONS":
-            return self.options(url, **kwargs)
-        else:
-            raise ValueError(f"Invalid method type: {method}")
-
-    def get(self, url: str, **kwargs):
-        return self._make_request(self.session.get, url, method_type="GET", **kwargs)
-
-    def post(self, url: str, **kwargs):
-        return self._make_request(self.session.post, url, method_type="POST", **kwargs)
-
-    def put(self, url: str, **kwargs):
-        return self._make_request(self.session.put, url, method_type="PUT", **kwargs)
-
-    def delete(self, url: str, **kwargs):
-        return self._make_request(self.session.delete, url, method_type="DELETE", **kwargs)
-
-    def options(self, url: str, **kwargs):
-        return self._make_request(self.session.options, url, method_type="OPTIONS", **kwargs)
-
-    def close(self):
-        self.terminate_antibot_sessions()
-        self.session.close()
-
-    def set_cookie(self, name, value, domain):
-        self.session.set_cookie(name=name, value=value, domain=domain)
-
-    def set_cookies(self, cookies: dict):
-        self.session.set_cookies(cookies)
-
-    def delete_cookies(self, cookies_list: str | list):
-        self.session.delete_cookies(cookies_list)
-
-    def clear_cookies(self, skip_these: str | list = ""):
-        self.session.clear_cookies(skip_these)
-
-    @property
-    def headers(self):
-        return self.session.headers
-
-    def update_headers(self, new_headers: dict):
-        self.session.update_headers(new_headers)
-
-    def set_new_headers(self, new_headers: dict):
-        self.session.set_new_headers(new_headers)
-
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    @property
-    def proxies(self):
-        return self.session.proxies
-
-    @proxies.setter
-    def proxies(self, value):
-        self.session.proxies = value
-
-    def to_json(self):
-        json_from_clients = self.session.to_json()
-        return {
-            **json_from_clients,
-            "antibots": self.antibots_to_json()
-        }
-
-    @classmethod
-    def from_json(cls, **kwargs):
-        raise NotImplementedError("This is wrapper class. You cannot create an instance of it.")
-
-    def reset_client(self, reset_antibot_solvers=True):
-        self.session.reset_client()
-
-        # Reset the antibot solvers
-        if reset_antibot_solvers:
-            self.reset_antibot_solvers()
-
-    def copy_essentials(self, other: "RequestHandler"):
-        self.session.copy_essentials(other.session)
-
-    def __getattr__(self, name):
-        return getattr(self.session, name)
+        raise RequestsGroupedError(
+            f"Failed to make the request in {max_retries} tries", errors
+        )

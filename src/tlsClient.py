@@ -4,6 +4,7 @@ from tls_client import Session as tlsClient
 from urllib.parse import quote
 
 from src.abstractClient import Client
+from src.middlewareClient import MiddlewareClient
 from src.utils.headerTools import HeaderHelper
 
 from src.utils.httpsUtils import is_charles_running
@@ -40,7 +41,7 @@ def kwargs_processing(func):
 
 # noinspection PyTypeChecker
 # noinspection PyProtectedMember
-class TLSClientSession(Client):
+class TLSClientSession(MiddlewareClient):
     def __init__(
             self,
             proxies: dict = None,
