@@ -1,12 +1,10 @@
-import random
-import socket
 from abc import ABC, abstractmethod
 from http.cookiejar import Cookie
 
-from database.anonymousConsumables.proxiesHandler import ProxiesHandler
-from errors.antibot.antiBotErrors import AntiBotSolverError
+from src.utils.headerTools import HeaderHelper
 
-from websites.headerHelper import HeaderHelper
+from src.utils.proxiesHandler import ProxiesHandler
+
 
 # noinspection PyProtectedMember
 class Client(ABC):
@@ -16,19 +14,16 @@ class Client(ABC):
         self.session = None
 
     @property
-    @abstractmethod
     def cookies(self):
-        pass
+        return self.session.cookies
 
     @property
-    @abstractmethod
     def proxies(self):
-        pass
+        return self.session.proxies
 
     @property
-    @abstractmethod
     def headers(self):
-        pass
+        return self.session.headers
 
     @abstractmethod
     def update_headers(self, new_headers: dict):
@@ -161,12 +156,12 @@ class Client(ABC):
             )
             self.cookies.set_cookie(cookie)
 
-    def rotate_ip(self):
+    def rotate_ip(self, new_proxy: dict = None):
         proxies = ""
         if self.proxies:
             retries = 0
             while not proxies and retries < 10:
-                proxies = ProxiesHandler.get_proxy()
+                proxies = new_proxy or ProxiesHandler.get_proxy()
                 retries += 1
 
             self.proxies = proxies
