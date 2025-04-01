@@ -39,7 +39,7 @@ def kwargs_processing(func):
     return wrapper
 
 
-class TLSClientSession(MiddlewareClient):
+class TLSClient(MiddlewareClient):
     """
     A concrete implementation of the Client interface using the tls_client library.
 
@@ -145,7 +145,7 @@ class TLSClientSession(MiddlewareClient):
     def to_json(self):
         """Serialize the session to a JSON-serializable dictionary."""
         data = {
-            'sessionClientType': 'TLSClientSession',
+            'sessionClientType': 'TLSClient',
             'client_identifier': self.client_identifier,
             'headers': dict(self.headers),
             'cookies': self._serialize_cookies(),
@@ -156,7 +156,7 @@ class TLSClientSession(MiddlewareClient):
 
     @classmethod
     def from_json(cls, data: dict, header_helper: HeaderHelper):
-        """Create a TLSClientSession from JSON data."""
+        """Create a TLSClient from JSON data."""
         instance = cls(header_helper=header_helper, client_identifier=data.get('client_identifier', "chrome_120"))
         if data.get("client_identifier"):
             instance.headers.update(data['headers'])
@@ -179,7 +179,7 @@ class TLSClientSession(MiddlewareClient):
         self.session.headers.update(preset_headers)
         self.proxies = proxies
 
-    def copy_essentials(self, other: "TLSClientSession"):
+    def copy_essentials(self, other: "TLSClient"):
         super().copy_essentials(other)
 
         self.header_helper = other.header_helper
