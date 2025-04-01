@@ -3,8 +3,7 @@ import uuid
 from tls_client import Session as tlsClient
 from urllib.parse import quote
 
-from src.abstractClient import Client
-from src.middlewareClient import MiddlewareClient
+from src.middlewareClient import MiddlewareClient, request_through_middleware
 from src.utils.headerTools import HeaderHelper
 
 from src.utils.httpsUtils import is_charles_running
@@ -12,9 +11,10 @@ from src.utils.httpsUtils import is_charles_running
 
 def kwargs_processing(func):
     """
-    Decorator function that processes the kwargs before passing them to the requests function.
+    **MUST COME BEFORE ANY OTHER DECORATOR**,
+        as it is directly related to the kwargs of the requests function.
 
-    Since we are using an entirely different library, some kwargs from the requestHandler might not work properly
+    This is a decorator function that processes the kwargs before passing them to the requests function.
     """
 
     def wrapper(self, url: str, **kwargs):
@@ -39,8 +39,6 @@ def kwargs_processing(func):
     return wrapper
 
 
-# noinspection PyTypeChecker
-# noinspection PyProtectedMember
 class TLSClientSession(MiddlewareClient):
     def __init__(
             self,
@@ -108,24 +106,29 @@ class TLSClientSession(MiddlewareClient):
         # reset session id to force the client to refresh cookies
         self.session._session_id = str(uuid.uuid4())
 
+    @request_through_middleware
     @kwargs_processing
     def get(self, url: str, **kwargs):
         return self.session.get(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def post(self, url: str, **kwargs):
         if 'data' in kwargs and isinstance(kwargs['data'], dict):
             kwargs['data'] = '&'.join([f"{k}={v}" for k, v in kwargs['data'].items()])
         return self.session.post(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def put(self, url: str, **kwargs):
         return self.session.put(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def delete(self, url: str, **kwargs):
         return self.session.delete(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def options(self, url: str, **kwargs):
         return self.session.options(url, **kwargs)

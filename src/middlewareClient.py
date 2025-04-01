@@ -15,12 +15,31 @@ from src.errors.httpErrors import UnauthorizedError, AntiBotBlockError, NotFound
 urllib3.disable_warnings()
 
 
+def request_through_middleware(func):
+    """
+    Decorator function that marks the request as either going through the middleware or not.
+    Whenever this decorator is present it marks the fact that the request is going to call the _make_request function.
+
+    :param func: an object's instance that inherits from the MiddlewareClient class
+    :return: a function that calls the _make_request function
+    """
+
+    def wrapper(self, url: str, **kwargs) -> Callable:
+        if kwargs.get("no_middleware"):
+            del kwargs["no_middleware"]
+            return func(self, url, **kwargs)
+
+        return self._middleware_request(func, url, **kwargs)
+
+    return wrapper
+
+
 class MiddlewareClient(Client, ABC):
     """
-    Wraps the client session and adds error handling to the requests.
-
-    Inherits from the Client class in order to be able to use the same interface.
+    Acts as a middleware between the Client Interface and the concrete
+    implementations of the Interface. It provides an automated way of handling the requests pre- and post-processing.
     """
+
     @staticmethod
     def check_response_status(response: requests.Response, custom_status_handling_function: Callable = None,
                               statuses_to_skip: list = None):
@@ -71,6 +90,9 @@ class MiddlewareClient(Client, ABC):
         Processes the kwargs before passing them to the requests function.
         :param kwargs: the kwargs to process
         """
+        # Delete if there is any middleware flag
+        kwargs.pop("no_middleware", None)
+
         # set the default timeout to 20 seconds
         if not kwargs.get('timeout'):
             kwargs['timeout'] = 5
@@ -133,7 +155,7 @@ class MiddlewareClient(Client, ABC):
                 self.delete_cookies([morsel.key])
                 self.set_cookie(name=morsel.key, value=morsel.value, domain=morsel['domain'])
 
-    def _make_request(self, request_method: Callable, url: str, max_retries=3, **kwargs):
+    def _middleware_request(self, request_method: Callable, url: str, max_retries=3, **kwargs):
         """Wrapper around the request method to handle errors and retries."""
         errors = []
         retries = 0

@@ -1,6 +1,6 @@
 from requests import Session
 
-from src.middlewareClient import MiddlewareClient
+from src.middlewareClient import MiddlewareClient, request_through_middleware
 from src.utils.headerTools import HeaderHelper
 
 from src.utils.httpsUtils import is_charles_running
@@ -8,9 +8,10 @@ from src.utils.httpsUtils import is_charles_running
 
 def kwargs_processing(func):
     """
-    Decorator function that processes the kwargs before passing them to the requests function.
+    **MUST COME BEFORE ANY OTHER DECORATOR**,
+        as it is directly related to the kwargs of the requests function.
 
-    Since we are using an entirely different library, some kwargs from the requestHandler might not work properly
+    This is a decorator function that processes the kwargs before passing them to the requests function.
     """
 
     def wrapper(self, *args, **kwargs):
@@ -32,7 +33,6 @@ class RequestsClient(MiddlewareClient):
     """
     Concrete implementation of the Client interface using the requests library Session feature.
     """
-
     def __init__(
             self,
             proxies: dict = None,
@@ -65,22 +65,27 @@ class RequestsClient(MiddlewareClient):
     def set_cookies(self, cookies: dict):
         self.session.cookies.update(cookies)
 
+    @request_through_middleware
     @kwargs_processing
     def get(self, url: str, **kwargs):
         return self.session.get(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def post(self, url: str, **kwargs):
         return self.session.post(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def put(self, url: str, **kwargs):
         return self.session.put(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def delete(self, url: str, **kwargs):
         return self.session.delete(url, **kwargs)
 
+    @request_through_middleware
     @kwargs_processing
     def options(self, url: str, **kwargs):
         return self.session.options(url, **kwargs)
