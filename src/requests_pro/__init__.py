@@ -3,7 +3,9 @@
 # clients that you'd like to wrap around with this. The biggest advantage is that
 # you can easily switch between the two clients without changing the code later on.
 # By forcing the concrete clients to implement the same methods, it can give your
-# project a lot of flexibility and scalability in the future.
+# project a lot of flexibility and scalability in the future. Moreover, by combining
+# multiple design patterns such as Proxy Design Pattern, Factory Method i managed to
+# refurbish a lot of code and make it more readable and maintainable.
 #
 # The main reason why i started this was to deal with the ever growing issue of checking
 # the status codes after making a request. By using this wrapper, you can easily
