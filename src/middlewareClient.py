@@ -24,12 +24,12 @@ def request_through_middleware(func):
     :return: a function that calls the _make_request function
     """
 
-    def wrapper(self, url: str, **kwargs) -> Callable:
+    def wrapper(self, url: str, *args, **kwargs) -> Callable:
         if kwargs.get("no_middleware"):
             del kwargs["no_middleware"]
-            return func(self, url, **kwargs)
+            return func(self, url, *args, **kwargs)
 
-        return self._middleware_request(func, url, **kwargs)
+        return self._middleware_request(func, url, *args, **kwargs)
 
     return wrapper
 
