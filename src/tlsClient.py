@@ -40,6 +40,12 @@ def kwargs_processing(func):
 
 
 class TLSClientSession(MiddlewareClient):
+    """
+    A concrete implementation of the Client interface using the tls_client library.
+
+    Provides cookie persistence, connection-pooling, configuration and most importantly,
+        low level details that can be configured with the underlying tls_client library.
+    """
     def __init__(
             self,
             proxies: dict = None,

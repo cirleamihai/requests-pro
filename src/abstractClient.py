@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from http.cookiejar import Cookie
 
+from src.response import Response
 from src.utils.headerTools import HeaderHelper
 
 from src.utils.proxiesHandler import ProxiesHandler
@@ -34,23 +35,23 @@ class Client(ABC):
         pass
 
     @abstractmethod
-    def get(self, url: str, **kwargs):
+    def get(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod
-    def post(self, url: str, **kwargs):
+    def post(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod
-    def put(self, url: str, **kwargs):
+    def put(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod
-    def delete(self, url: str, **kwargs):
+    def delete(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod
-    def options(self, url: str, **kwargs):
+    def options(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod

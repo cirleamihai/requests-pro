@@ -31,7 +31,10 @@ def kwargs_processing(func):
 
 class RequestsClient(MiddlewareClient):
     """
-    Concrete implementation of the Client interface using the requests library Session feature.
+    A concrete implementation of the Client interface using the requests library.
+
+    Provides cookie persistence, connection-pooling, and configuration to
+    the underlying requests library.
     """
     def __init__(
             self,
