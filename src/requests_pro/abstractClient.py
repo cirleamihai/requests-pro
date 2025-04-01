@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
 from http.cookiejar import Cookie
 
-from src.response import Response
-from src.utils.headerTools import HeaderHelper
-
-from src.utils.proxiesHandler import ProxiesHandler
+from .response import Response
+from .utils.headerTools import HeaderHelper
+from .utils.proxiesHandler import ProxiesHandler
 
 
 # noinspection PyProtectedMember

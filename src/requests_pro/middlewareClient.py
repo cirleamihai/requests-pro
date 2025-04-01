@@ -1,16 +1,15 @@
 from abc import ABC
 from http.cookies import SimpleCookie
-
-import requests
 from typing import Callable
 
+import requests
+import urllib3
 from requests import HTTPError, RequestException
 from tls_client.exceptions import TLSClientExeption
 
-from src.abstractClient import Client
-import urllib3
-
-from src.errors.httpErrors import UnauthorizedError, AntiBotBlockError, NotFoundError, RequestsGroupedError
+from .abstractClient import Client
+from .errors.httpErrors import (AntiBotBlockError, NotFoundError,
+                                RequestsGroupedError, UnauthorizedError)
 
 urllib3.disable_warnings()
 
@@ -63,21 +62,21 @@ class MiddlewareClient(Client, ABC):
 
             elif response.status_code == 403:
                 raise AntiBotBlockError(
-                    message=f"Blocked by AntiBot",
+                    message="Blocked by AntiBot",
                     response_str=response.text,
                     response_obj=response
                 )
 
             elif response.status_code == 401:
                 raise UnauthorizedError(
-                    message=f"Unauthorized",
+                    message="Unauthorized",
                     response_str=response.text,
                     response_obj=response
                 )
 
             elif response.status_code == 404:
                 raise NotFoundError(
-                    message=f"Page not found",
+                    message="Page not found",
                     response_str=response.text,
                     response_obj=response
                 )
@@ -182,7 +181,8 @@ class MiddlewareClient(Client, ABC):
 
                 if (redirected and not skip_redirects and url != redirect_endpoint_stop
                         and not (redirect_endpoint_contains_stop and redirect_endpoint_contains_stop in url)):
-                    if 'params' in kwargs: del kwargs['params']
+                    if 'params' in kwargs:
+                        del kwargs['params']
                     continue
 
                 return response

@@ -1,5 +1,5 @@
-import socket
 import random
+import socket
 
 CHARLES_CONFIGURATION = ('127.0.0.1', 8888, 0.01)
 

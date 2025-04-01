@@ -1,12 +1,11 @@
 import uuid
-
-from tls_client import Session as tlsClient
 from urllib.parse import quote
 
-from src.middlewareClient import MiddlewareClient, request_through_middleware
-from src.utils.headerTools import HeaderHelper
+from tls_client import Session as tlsClient
 
-from src.utils.httpsUtils import is_charles_running
+from .middlewareClient import MiddlewareClient, request_through_middleware
+from .utils.headerTools import HeaderHelper
+from .utils.httpsUtils import is_charles_running
 
 
 def kwargs_processing(func):

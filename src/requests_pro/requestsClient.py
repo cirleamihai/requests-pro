@@ -1,9 +1,8 @@
 from requests import Session
 
-from src.middlewareClient import MiddlewareClient, request_through_middleware
-from src.utils.headerTools import HeaderHelper
-
-from src.utils.httpsUtils import is_charles_running
+from .middlewareClient import MiddlewareClient, request_through_middleware
+from .utils.headerTools import HeaderHelper
+from .utils.httpsUtils import is_charles_running
 
 
 def kwargs_processing(func):
