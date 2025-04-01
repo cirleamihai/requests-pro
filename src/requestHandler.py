@@ -18,15 +18,12 @@ class RequestHandler(Client):
     """
     Wraps the client session and adds error handling to the requests.
 
-    Inherits from the ClientSession class in order to be able to use the same interface.
+    Inherits from the Client class in order to be able to use the same interface.
     """
 
     # noinspection PyMissingConstructor
-    def __init__(self, session: Client, **kwargs):
+    def __init__(self, session: Client):
         self.session = session
-        self.logger = kwargs['logger']
-
-        self.set_antibot_solvers(**kwargs)
 
     @staticmethod
     def check_response_status(response: requests.Response, custom_status_handling_function: Callable = None,

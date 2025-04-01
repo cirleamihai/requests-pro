@@ -1,7 +1,9 @@
 from requests import Session
 
-from httpSessions.clientSession import ClientSession, is_ip_port_taken
-from websites.headerHelper import HeaderHelper
+from src.abstractClient import Client
+from src.utils.headerTools import HeaderHelper
+
+from src.utils.httpsUtils import is_charles_running
 
 
 def kwargs_processing(func):
@@ -15,7 +17,7 @@ def kwargs_processing(func):
         if 'verify' in kwargs:
             kwargs['verify'] = False
 
-            if is_ip_port_taken():
+            if is_charles_running():
                 kwargs['proxies'] = {
                     "http": "http://127.0.0.1:8888",
                     "https": "http://127.0.0.1:8888",
@@ -26,54 +28,36 @@ def kwargs_processing(func):
     return wrapper
 
 
-class RequestsClientSession(ClientSession):
+class RequestsClient(Client):
     """
-    Concrete implementation of the ClientSession interface using the requests library Session feature.
+    Concrete implementation of the Client interface using the requests library Session feature.
     """
 
-    def __init__(self, header_helper: HeaderHelper, **kwargs):
+    def __init__(
+            self,
+            proxies: dict = None,
+            headers: dict = None,
+            header_helper: HeaderHelper = None,
+    ):
         super().__init__()
         self.session = Session()
-        self.header_helper: HeaderHelper = header_helper
+        self.header_helper: HeaderHelper = header_helper or HeaderHelper()
         self.client_identifier = "128"
 
         preset_headers = self.header_helper.get_headers(client_identifier=self.client_identifier)
         self.session.headers.update(preset_headers)
 
-        if kwargs.get('proxies'):
-            self.session.proxies = kwargs.get('proxies')
+        if proxies:
+            self.session.proxies = proxies
 
-        if kwargs.get('headers'):
-            self.session.headers.update(kwargs.get('headers'))
-
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    @property
-    def proxies(self):
-        return self.session.proxies
-
-    @property
-    def headers(self):
-        return self.session.headers
+        if headers:
+            self.session.headers.update(headers)
 
     def update_headers(self, new_headers: dict):
         self.session.headers.update(new_headers)
 
     def set_new_headers(self, new_headers: dict):
         self.session.headers = new_headers
-
-    @proxies.setter
-    def proxies(self, new_proxies: dict | str):
-        """ Accepts either a dictionary or a string for the proxies. """
-        if isinstance(new_proxies, str):
-            new_proxies = {'http': new_proxies, 'https': new_proxies}
-
-        if not new_proxies.get('http') and not new_proxies.get('https'):
-            raise ValueError("Proxies must contain an http and https key")
-
-        self.session.proxies = new_proxies
 
     def set_cookie(self, name, value, domain):
         self.session.cookies.set(name=name, value=value, domain=domain)
@@ -119,7 +103,7 @@ class RequestsClientSession(ClientSession):
     def to_json(self):
         """Serialize the session to a JSON-serializable dictionary."""
         data = {
-            'sessionClientType': 'RequestsClientSession',
+            'sessionClientType': 'RequestsClient',
             'headers': dict(self.headers),
             'cookies': self._serialize_cookies(),
             'proxies': self.proxies,
@@ -138,7 +122,7 @@ class RequestsClientSession(ClientSession):
 
         return instance
 
-    def copy_essentials(self, other: "RequestsClientSession"):
+    def copy_essentials(self, other: "RequestsClient"):
         super().copy_essentials(other)
 
         self.header_helper = other.header_helper

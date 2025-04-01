@@ -1,31 +1,65 @@
 import uuid
 
 from tls_client import Session as tlsClient
-
-from httpSessions.clientSession import ClientSession
 from urllib.parse import quote
 
-from websites.headerHelper import HeaderHelper
+from src.abstractClient import Client
+from src.utils.headerTools import HeaderHelper
 
 from src.utils.httpsUtils import is_charles_running
 
 
+def kwargs_processing(func):
+    """
+    Decorator function that processes the kwargs before passing them to the requests function.
+
+    Since we are using an entirely different library, some kwargs from the requestHandler might not work properly
+    """
+
+    def wrapper(self, url: str, **kwargs):
+        # Rename the timeout keyword to timeout_seconds
+        if 'timeout' in kwargs:
+            kwargs['timeout_seconds'] = kwargs.pop('timeout')
+
+        if 'verify' in kwargs:
+            kwargs['insecure_skip_verify'] = not kwargs.pop('verify')
+
+            if is_charles_running():
+                kwargs['proxy'] = {
+                    "http": "http://127.0.0.1:8888",
+                    "https": "http://127.0.0.1:8888",
+                }
+
+        # Encoding the url
+        encoded_url = quote(url, safe=':/?&=%.,/;')
+
+        return func(self, encoded_url, **kwargs)
+
+    return wrapper
+
+
 # noinspection PyTypeChecker
 # noinspection PyProtectedMember
-class TLSClientSession(ClientSession):
-    def __init__(self, header_helper, client_identifier="chrome_120", **kwargs):
+class TLSClientSession(Client):
+    def __init__(
+            self,
+            proxies: dict = None,
+            headers: dict = None,
+            header_helper: HeaderHelper = None,
+            client_identifier: str = "chrome_120",
+    ):
         """
         Currently using this tls client as a wrapper around the requests library:
             https://github.com/FlorianREGAZ/Python-Tls-Client
                 which is inspired by https://github.com/bogdanfinn/tls-client
 
-        Currently using chrome 120 which is the default. Subject to use custom in the future
+        Currently using chrome 120 which is the default. You can use whatever client_identifier you may want to.
         """
         super().__init__()
         self.client_identifier = client_identifier
 
         # Getting the header order from the header helper
-        self.header_helper: HeaderHelper = header_helper
+        self.header_helper: HeaderHelper = header_helper or HeaderHelper()
         self.header_order = self.header_helper.get_header_order()
 
         self.session = tlsClient(self.client_identifier,
@@ -33,76 +67,21 @@ class TLSClientSession(ClientSession):
                                  header_order=self.header_order,
                                  )
 
-        if kwargs.get('proxies'):
-            self.proxies = kwargs.get('proxies')
+        if proxies:
+            self.proxies = proxies
 
-        if kwargs.get('headers'):
-            self.session.headers.update(kwargs.get('headers'))
+        if headers:
+            self.session.headers.update(headers)
 
         # Create a real user agent to match the tls client identifier
         preset_headers = self.header_helper.get_headers(self.client_identifier)
         self.headers.update(preset_headers)
-
-    @staticmethod
-    def kwargs_processing(func):
-        """
-        Decorator function that processes the kwargs before passing them to the requests function.
-
-        Since we are using an entirely different library, some kwargs from the requestHandler might not work properly
-        """
-
-        def wrapper(self, url: str, **kwargs):
-            # Rename the timeout keyword to timeout_seconds
-            if 'timeout' in kwargs:
-                kwargs['timeout_seconds'] = kwargs.pop('timeout')
-
-            if 'verify' in kwargs:
-                kwargs['insecure_skip_verify'] = not kwargs.pop('verify')
-
-                if is_charles_running():
-                    kwargs['proxy'] = {
-                        "http": "http://127.0.0.1:8888",
-                        "https": "http://127.0.0.1:8888",
-                    }
-
-            # Encoding the url
-            encoded_url = quote(url, safe=':/?&=%.,/;')
-
-            return func(self, encoded_url, **kwargs)
-
-        return wrapper
-
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    @property
-    def proxies(self):
-        return self.session.proxies
-
-    @property
-    def headers(self):
-        return self.session.headers
 
     def update_headers(self, new_headers: dict):
         self.session.headers.update(new_headers)
 
     def set_new_headers(self, new_headers: dict):
         self.session.headers = new_headers
-
-    @proxies.setter
-    def proxies(self, new_proxies: dict | str):
-        """ Accepts either a dictionary or a string for the proxies. """
-        if not new_proxies:
-            return
-
-        if isinstance(new_proxies, str):
-            new_proxies = {'http': new_proxies, 'https': new_proxies}
-
-        if not new_proxies.get('http') and not new_proxies.get('https'):
-            raise ValueError("Proxies must contain an http and https key")
-
-        self.session.proxies = new_proxies
 
     def set_cookie(self, name, value, domain):
         self.cookies.set(name=name, value=value, domain=domain)
@@ -176,9 +155,9 @@ class TLSClientSession(ClientSession):
 
         return instance
 
-    def reset_client(self, use_proxies: bool = True):
+    def reset_client(self, use_proxies: bool = True, proxies: dict = None):
         self.rotate_ip()
-        proxies = self.proxies if use_proxies else ""
+        proxies = (proxies or self.proxies) if use_proxies else ""
         self.session.close()
 
         self.session = tlsClient(self.client_identifier,

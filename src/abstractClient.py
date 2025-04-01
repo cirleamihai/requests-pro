@@ -13,29 +13,12 @@ class Client(ABC):
     def __init__(self):
         self.session = None
 
-    @property
-    def cookies(self):
-        return self.session.cookies
-
-    @property
-    def proxies(self):
-        return self.session.proxies
-
-    @property
-    def headers(self):
-        return self.session.headers
-
     @abstractmethod
     def update_headers(self, new_headers: dict):
         pass
 
     @abstractmethod
     def set_new_headers(self, new_headers: dict):
-        pass
-
-    @proxies.setter
-    @abstractmethod
-    def proxies(self, value):
         pass
 
     @abstractmethod
@@ -85,6 +68,31 @@ class Client(ABC):
     @abstractmethod
     def from_json(self, data: dict, header_helper: HeaderHelper):
         pass
+
+    @property
+    def cookies(self):
+        return self.session.cookies
+
+    @property
+    def proxies(self):
+        return self.session.proxies
+
+    @property
+    def headers(self):
+        return self.session.headers
+
+    @proxies.setter
+    def proxies(self, new_proxies):
+        if not new_proxies:
+            return
+
+        if isinstance(new_proxies, str):
+            new_proxies = {'http': new_proxies, 'https': new_proxies}
+
+        if not new_proxies.get('http') and not new_proxies.get('https'):
+            raise ValueError("Proxies must contain an http and https key")
+
+        self.session.proxies = new_proxies
 
     def copy_essentials(self, other: "Client"):
         self.set_cookies(other.cookies)

@@ -32,8 +32,10 @@ class HeaderTools:
         return ', '.join(accept_language_parts)
 
     @staticmethod
-    def get_random_user_agent() -> dict:
+    def get_random_user_agent(*args, **kwargs) -> dict:
         """
+        NOT IMPLEMENTED, UP TO USER's implementation
+
         Constructs a dictionary containing a realistic Chrome user agent string and
         the associated Client Hints headers. These headers include information about the browser version,
         whether the device is mobile, and the platform.
@@ -57,6 +59,7 @@ class HeaderTools:
             }
 
         """
+        return {}
 
 
 class HeaderHelper(HeaderTools):
@@ -67,7 +70,7 @@ class HeaderHelper(HeaderTools):
     def get_header_order(self):
         return self.header_order
 
-    def get_headers(self):
+    def get_headers(self, client_identifier: str):
         headers = {
             "Accept": "*/*",
             "Accept-Language": self.accept_language,
@@ -75,7 +78,7 @@ class HeaderHelper(HeaderTools):
         }
 
         # Create a real user agent to match the tls client identifier
-        user_agent_related_headers = self.get_random_user_agent()
+        user_agent_related_headers = self.get_random_user_agent(client_identifier)
         if user_agent_related_headers:
             headers.update(user_agent_related_headers)
 
