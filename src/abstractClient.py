@@ -69,6 +69,20 @@ class Client(ABC):
     def from_json(self, data: dict, header_helper: HeaderHelper):
         pass
 
+    def request(self, method: str, url: str, **kwargs):
+        if method == "GET":
+            return self.get(url, **kwargs)
+        elif method == "POST":
+            return self.post(url, **kwargs)
+        elif method == "PUT":
+            return self.put(url, **kwargs)
+        elif method == "DELETE":
+            return self.delete(url, **kwargs)
+        elif method == "OPTIONS":
+            return self.options(url, **kwargs)
+        else:
+            raise ValueError(f"Invalid method type: {method}")
+
     @property
     def cookies(self):
         return self.session.cookies
