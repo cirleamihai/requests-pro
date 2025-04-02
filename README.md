@@ -59,3 +59,31 @@ git clone https://github.com/cirleamihai/requests_pro.git
 cd requests_pro
 pip install .
 ```
+
+## Design Highlights
+
+`requests_pro` was designed with **developer ergonomics**, **realistic web behavior**, and **clean software design** in mind. Key architectural decisions include:
+
+- **Encapsulation of real-world client behaviors** using Proxy + Adapter patterns.
+- **Extension without modification**, via base abstract classes like `MiddlewareClient`.
+- **Swappable logic units** such as header generators, proxy managers, and middleware controllers.
+- **Middleware hooks per request** for granular error handling and recovery logic.
+- **Scalable architecture** using Factory + Strategy patterns.
+
+## Contributing
+
+Pull requests are welcome! If you're interested in contributing a new client type or adding utility functions (e.g. a HAR parser or TLS fingerprinting utilities), feel free to open an issue or submit a PR.
+
+Before submitting, please:
+
+- Format with `ruff` or `black`
+- Sort imports with `isort`
+- Follow existing file organization
+- Include minimal working examples in `/examples`
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+Made with ❤️ by [cirleamihai](https://github.com/cirleamihai)
