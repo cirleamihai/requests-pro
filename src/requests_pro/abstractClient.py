@@ -119,8 +119,9 @@ class Client(ABC):
         :param proxies: Proxy mapping used for the request.
         :param verify: Whether to verify the server's TLS certificate.
 
-        :param no_middleware: If True, bypass all middleware logic.
+        :param no_middleware: If True, bypass all middleware logic. This has bigger precedence over the class variable.
         :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+            This has bigger precedence over the class variable.
 
         :param middl_max_retries: Maximum number of retry attempts through middleware.
         :param middl_skip_status_check: If True, skip status code validation logic in middleware.

@@ -25,8 +25,8 @@ def kwargs_processing(func):
         if 'timeout' in kwargs:
             kwargs['timeout_seconds'] = kwargs.pop('timeout')
 
-        if 'verify' in kwargs:
-            kwargs['insecure_skip_verify'] = not kwargs.pop('verify')
+        if not kwargs.get('verify'):
+            kwargs['insecure_skip_verify'] = not kwargs.pop('verify', False)
 
             if (kwargs.pop('use_mitm_when_active', self.use_mitm_when_active)) and is_charles_running():
                 kwargs['proxy'] = {
@@ -35,7 +35,6 @@ def kwargs_processing(func):
                 }
 
         # Encoding the url
-        print(kwargs)
         encoded_url = quote(url, safe=':/?&=%.,/;')
 
         return func(self, url=encoded_url, **kwargs)

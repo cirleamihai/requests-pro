@@ -10,7 +10,7 @@ from tls_client.exceptions import TLSClientExeption
 
 from abstractClient import Client
 from errors.httpErrors import (AntiBotBlockError, NotFoundError,
-                                RequestsGroupedError, UnauthorizedError)
+                               RequestsGroupedError, UnauthorizedError)
 
 urllib3.disable_warnings()
 
@@ -23,9 +23,13 @@ def request_through_middleware(func):
     :param func: an object's instance that inherits from the MiddlewareClient class
     :return: a function that calls the _make_request function
     """
+
     @functools.wraps(func)
     def wrapper(self, url: str, *args, **kwargs) -> Callable:
         if kwargs.pop("no_middleware", self.no_middleware):
+            for key in kwargs.copy().keys():
+                if key.startswith("middl_"): kwargs.pop(key)
+
             return func(self, url, *args, **kwargs)
 
         return self._middleware_request(func, url, *args, **kwargs)

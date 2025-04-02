@@ -15,7 +15,7 @@ def kwargs_processing(func):
     """
 
     def wrapper(self, *args, **kwargs):
-        if 'verify' in kwargs:
+        if not kwargs.get('verify'):
             kwargs['verify'] = False
 
             if (kwargs.pop('use_mitm_when_active', self.use_mitm_when_active)) and is_charles_running():
