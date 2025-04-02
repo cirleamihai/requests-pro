@@ -58,7 +58,24 @@ class Client(ABC):
         pass
 
     @abstractmethod
-    def reset_client(self, **kwargs):
+    def reset_client(self, proxies: dict = None, proxy_filename_path: str = "", use_proxies: bool = True):
+        """
+        The function is responsible for resetting the client session to its initial
+        state. It has two possible ways of resetting the client session:
+        1. By explicitly passing a proxies dictionary to the function
+            via the proxies parameter. (has precedence over the later)
+        2. Pass in a path to a file containing a list of raw and unprocessed proxies.
+
+        Then, we create a new internal session, and chose the set of basic headers
+        that is present in the HeaderHelper class. This can be different from the previous one
+        if HeaderTools.get_random_user_agent() function is functioning right.
+
+        :param proxies: A dictionary of proxies to apply to the new session
+        :param proxy_filename_path: An absolute path to a file containing raw lines of proxies
+        :param use_proxies: A boolean that indicates whether the client should use proxies or not.
+            **Defaults to True**
+        :return:
+        """
         pass
 
     @abstractmethod
@@ -178,12 +195,12 @@ class Client(ABC):
             )
             self.cookies.set_cookie(cookie)
 
-    def rotate_ip(self, new_proxy: dict = None):
+    def rotate_ip(self, new_proxy: dict = None, proxy_filename_path: str = ""):
         proxies = ""
         if self.proxies:
             retries = 0
             while not proxies and retries < 10:
-                proxies = new_proxy or ProxiesHandler.get_proxy()
+                proxies = new_proxy or ProxiesHandler.get_proxy(filename=proxy_filename_path)
                 retries += 1
 
             self.proxies = proxies

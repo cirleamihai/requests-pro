@@ -95,16 +95,15 @@ class RequestsClient(MiddlewareClient):
     def close(self):
         self.session.close()
 
-    def reset_client(self, use_proxies: bool = True):
-        self.rotate_ip()
+    def reset_client(self, proxies: dict = None, proxy_filename_path: str = "", use_proxies: bool = True):
+        self.rotate_ip(proxies, proxy_filename_path)
         proxies = self.proxies if use_proxies else ""
+        self.session.close()
 
         self.session = Session()
 
-        if self.header_helper:
-            preset_headers = self.header_helper.get_headers(client_identifier=self.client_identifier)
-            self.session.headers.update(preset_headers)
-
+        preset_headers = self.header_helper.get_headers(client_identifier=self.client_identifier)
+        self.session.headers.update(preset_headers)
         self.proxies = proxies
 
     def to_json(self):

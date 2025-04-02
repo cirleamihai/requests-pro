@@ -34,7 +34,6 @@ class HeaderTools:
     @staticmethod
     def get_random_user_agent(*args, **kwargs) -> dict:
         """
-        NOT IMPLEMENTED, UP TO USER's implementation
 
         Constructs a dictionary containing a realistic Chrome user agent string and
         the associated Client Hints headers. These headers include information about the browser version,
@@ -66,18 +65,18 @@ class HeaderHelper(HeaderTools):
     def __init__(self):
         self.header_order = []
         self.accept_language = self.get_random_accept_language()
-
-    def get_header_order(self):
-        return self.header_order
-
-    def get_headers(self, client_identifier: str):
-        headers = {
+        self.default_headers = {
             "Accept": "*/*",
             "Accept-Language": self.accept_language,
             "Sec-GPC": "1",
         }
 
+    def get_header_order(self):
+        return self.header_order
+
+    def get_headers(self, client_identifier: str):
         # Create a real user agent to match the tls client identifier
+        headers = self.default_headers.copy()
         user_agent_related_headers = self.get_random_user_agent(client_identifier)
         if user_agent_related_headers:
             headers.update(user_agent_related_headers)

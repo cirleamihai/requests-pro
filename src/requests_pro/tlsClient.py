@@ -203,15 +203,36 @@ class TLSClient(MiddlewareClient):
 
         return instance
 
-    def reset_client(self, use_proxies: bool = True, proxies: dict = None):
-        self.rotate_ip()
-        proxies = (proxies or self.proxies) if use_proxies else ""
-        self.session.close()
+    def reset_client(self, proxies: dict = None, proxy_filename_path: str = "", use_proxies: bool = True):
+        self.rotate_ip(proxies, proxy_filename_path)
+        proxies = self.proxies if use_proxies else ""
+        old_session = self.session
 
-        self.session = tlsClient(self.client_identifier,
-                                 random_tls_extension_order=True,
-                                 header_order=self.header_helper.get_header_order(),
-                                 )
+        self.session = tlsClient(
+            client_identifier=self.client_identifier,
+            random_tls_extension_order=True,
+            header_order=self.header_helper.get_header_order(),
+            ja3_string=old_session.ja3_string,
+            h2_settings=old_session.h2_settings,
+            h2_settings_order=old_session.h2_settings_order,
+            supported_signature_algorithms=old_session.supported_signature_algorithms,
+            supported_delegated_credentials_algorithms=old_session.supported_delegated_credentials_algorithms,
+            supported_versions=old_session.supported_versions,
+            key_share_curves=old_session.key_share_curves,
+            cert_compression_algo=old_session.cert_compression_algo,
+            additional_decode=old_session.additional_decode,
+            pseudo_header_order=old_session.pseudo_header_order,
+            connection_flow=old_session.connection_flow,
+            priority_frames=old_session.priority_frames,
+            header_priority=old_session.header_priority,
+            force_http1=old_session.force_http1,
+            catch_panics=old_session.catch_panics,
+            debug=old_session.debug,
+            certificate_pinning=old_session.certificate_pinning,
+        )
+
+        # Close the old session
+        old_session.close()
 
         preset_headers = self.header_helper.get_headers(client_identifier=self.client_identifier)
         self.session.headers.update(preset_headers)
