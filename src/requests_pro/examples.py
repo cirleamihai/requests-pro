@@ -1,10 +1,13 @@
-import requests
+import json
 
 from errors.httpErrors import RequestsGroupedError
 from requestsClient import RequestsClient
+from sessionFactory import SessionFactory
 from tlsClient import TLSClient
 import sys
 from pathlib import Path
+
+from utils.headerTools import HeaderHelper
 
 # @todo: Comment this out in production
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -251,4 +254,94 @@ def proxy_usage_example():
         print("Proxy response:", response.json())
     except Exception as e:
         print("Proxy error:", e)
+    client.close()
+
+
+def using_session_factory():
+    """
+    Create a default RequestsClient using the factory.
+    """
+    client = SessionFactory.create_client(client_type='requests')
+    response = client.get("https://httpbin.org/get")
+    print("Response (requests):", response.status_code, response.text)
+    print(json.dumps(client.to_json(), indent=2))
+    client.close()
+
+
+def client_with_proxy_file():
+    """
+    Create a TLSClient using a proxy randomly chosen from a file.
+    Assumes the file is in standard proxy format (ip:port or ip:port:user:pass).
+    """
+
+    proxy_file = "/your/absolute/path/to/proxies.txt"
+    client = SessionFactory.create_client(
+        client_type='tls',
+        proxy_file_path=proxy_file
+    )
+    response = client.get("https://httpbin.org/ip")
+    print("Proxied IP:", response.json())
+    client.close()
+
+
+def client_with_direct_proxy():
+    """
+    Create a RequestsClient with a manually provided proxy dictionary.
+    """
+    proxy_dict = {
+        "http": "http://127.0.0.1:8080",
+        "https": "http://127.0.0.1:8080"
+    }
+    client = SessionFactory.create_client(
+        client_type='requests',
+        proxy_dict=proxy_dict
+    )
+    response = client.get("https://httpbin.org/ip")
+    print("Proxied IP:", response.json())
+    client.close()
+
+
+def client_with_custom_header_helper():
+    """
+    Create a TLSClient with a custom HeaderHelper to enforce specific header behavior.
+    """
+
+    class MyNewCustomHeaderHelper(HeaderHelper):
+        pass
+
+    custom_header_helper = MyNewCustomHeaderHelper()
+    client = SessionFactory.create_client(
+        client_type='tls',
+        header_helper=custom_header_helper
+    )
+
+    print("Headers used:", client.headers)
+    client.close()
+
+
+def create_client_from_json():
+    json_alike_py_dict = {
+        "sessionClientType": "RequestsClient",
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6601.2 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, zstd",
+            "Accept": "*/*",
+            "Connection": "keep-alive",
+            "Accept-Language": "pt-PT, zh-CN;q=0.6",
+            "Sec-GPC": "1",
+            "Sec-Ch-Ua": "\"Google Chrome\";v=\"128\", \"Chromium\";v=\"128\", \"Not)A;Brand\";v=\"99\"",
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": "\"macOS\""
+        },
+        "cookies": [],
+        "proxies": {},
+        "header_helper": "HeaderHelper",
+        "no_middleware": False,
+        "use_mitm_when_active": True
+    }
+    client = SessionFactory.from_json(json_alike_py_dict)
+    print("Client created:", client)
+    client.get("https://httpbin.org/get")
+
+    print(client.headers)
     client.close()

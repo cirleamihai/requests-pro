@@ -48,7 +48,6 @@ class SessionFactory:
 
     @staticmethod
     def process_client_kwargs(
-            use_random_proxy_from_file: bool,
             proxy_file_path: str,
             proxy_dict: dict,
             header_helper: HeaderHelper,
@@ -56,16 +55,14 @@ class SessionFactory:
     ):
         """
         Processes and stores updated values to the kwargs before using them on instantiations.
-        :param proxy_dict: A dictionary of proxies to use this contradicts the use_random_proxy_from_file
-        :param use_random_proxy_from_file: A boolean that indicates whether the factory should try to automatically
-            load a random proxy from a given proxy file path
+        :param proxy_dict: A dictionary of proxies that means running the clients with custom proxies
         :param proxy_file_path: The path to the proxy file
         :param header_helper: The header helper to use in order to deal with automatic header
             handling (user agent, and other headers that need to match across requests)
         :param kwargs: the kwargs to store the processed values
         """
         # Setting up the proxies
-        if (use_random_proxy_from_file and proxy_file_path) or proxy_dict:
+        if proxy_file_path or proxy_dict:
             kwargs['proxies'] = proxy_dict or ProxiesHandler.get_proxy_dict(proxy_file_path)
 
         # By default, have a random header order option.
@@ -75,16 +72,16 @@ class SessionFactory:
     @staticmethod
     def create_client(
             client_type: str = 'requests',
-            use_random_proxy_from_file: bool = False,
             proxy_file_path: str = None,
             proxy_dict: dict = None,
             header_helper: HeaderHelper = None,
+            no_middleware: bool = False,
+            use_mitm_when_active: bool = True,
     ) -> Client:
         kwargs = {}
 
         # Processing the kwargs
         SessionFactory.process_client_kwargs(
-            use_random_proxy_from_file,
             proxy_file_path,
             proxy_dict,
             header_helper,
@@ -95,6 +92,10 @@ class SessionFactory:
             'requests': RequestsClient,
             'tls': TLSClient,
         }
-        client = client_type_map[client_type](**kwargs)
+        client = client_type_map[client_type](
+            no_middleware=no_middleware,
+            use_mitm_when_active=use_mitm_when_active,
+            **kwargs
+        )
 
         return client
