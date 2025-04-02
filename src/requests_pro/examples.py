@@ -10,7 +10,7 @@ from pathlib import Path
 from utils.headerTools import HeaderHelper
 
 # @todo: Comment this out in production
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def show_generated_headers():
