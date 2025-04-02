@@ -1,4 +1,5 @@
 import functools
+import logging
 from abc import ABC
 from http.cookies import SimpleCookie
 from typing import Callable
@@ -118,12 +119,23 @@ class MiddlewareClient(Client, ABC):
     @staticmethod
     def _check_for_redirects(response, url: str):
         redirected = False
+        old_url = url
+
         if 300 <= response.status_code <= 399:
             url = response.headers.get('Location')
             redirected = True
 
             if url is None:
                 redirected = False
+
+            else:
+                base_url = old_url.split('://')[0] + '://' + old_url.split('://')[1].split('/')[0]
+
+                if not url.startswith("/"):
+                    url = "/" + url
+
+                if base_url not in url:
+                    url = base_url + url
 
         return url, redirected
 
@@ -171,12 +183,16 @@ class MiddlewareClient(Client, ABC):
         statuses_to_skip = kwargs.pop("middl_statuses_to_skip", [])
 
         while retries < middl_max_retries:
+            if errors.__len__() > 0:
+                logging.error(errors[-1])
+
             try:
                 response = request_method(self, url=url, **kwargs)
                 self._set_cookies(response)
 
                 # Check for redirects
                 url, redirected = self._check_for_redirects(response, url)
+                print(url, "is redirected: ", redirected)
 
                 if not skip_status_check:
                     self.check_response_status(response, custom_status_handling_function, statuses_to_skip)
