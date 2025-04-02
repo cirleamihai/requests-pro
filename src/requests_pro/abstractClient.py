@@ -68,7 +68,7 @@ class Client(ABC):
 
         Then, we create a new internal session, and chose the set of basic headers
         that is present in the HeaderHelper class. This can be different from the previous one
-        if HeaderTools.get_random_user_agent() function is functioning right.
+        if HeaderTools.get_random_user_agent() function is returning a different user agent.
 
         :param proxies: A dictionary of proxies to apply to the new session
         :param proxy_filename_path: An absolute path to a file containing raw lines of proxies
