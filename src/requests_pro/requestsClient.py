@@ -1,13 +1,14 @@
 from requests import Session
 
 from middlewareClient import MiddlewareClient, request_through_middleware
+from response import Response
 from utils.headerTools import HeaderHelper
 from utils.httpsUtils import is_charles_running
 
 
 def kwargs_processing(func):
     """
-    **MUST COME BEFORE ANY OTHER DECORATOR**,
+    **MUST COME LAST**,
         as it is directly related to the kwargs of the requests function.
 
     This is a decorator function that processes the kwargs before passing them to the requests function.
@@ -71,28 +72,17 @@ class RequestsClient(MiddlewareClient):
 
     @request_through_middleware
     @kwargs_processing
-    def get(self, url: str, **kwargs):
-        return self.session.get(url, **kwargs)
-
-    @request_through_middleware
-    @kwargs_processing
-    def post(self, url: str, **kwargs):
-        return self.session.post(url, **kwargs)
-
-    @request_through_middleware
-    @kwargs_processing
-    def put(self, url: str, **kwargs):
-        return self.session.put(url, **kwargs)
-
-    @request_through_middleware
-    @kwargs_processing
-    def delete(self, url: str, **kwargs):
-        return self.session.delete(url, **kwargs)
-
-    @request_through_middleware
-    @kwargs_processing
-    def options(self, url: str, **kwargs):
-        return self.session.options(url, **kwargs)
+    def request(
+            self,
+            method: str,
+            url: str,
+            **kwargs
+    ) -> Response:
+        return self.session.request(
+            method=method,
+            url=url,
+            **kwargs
+        )
 
     def close(self):
         self.session.close()

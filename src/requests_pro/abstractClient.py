@@ -1,12 +1,37 @@
 from abc import ABC, abstractmethod
 from http.cookiejar import Cookie
+from typing import Optional, Any, Unpack, TypedDict, Callable
 
 from response import Response
 from utils.headerTools import HeaderHelper
 from utils.proxiesHandler import ProxiesHandler
 
 
-# noinspection PyProtectedMember
+class RequestParams(TypedDict, total=False):
+    params: dict[str, Any]
+    data: Any
+    headers: dict[str, str]
+    cookies: dict[str, str]
+    json: Any
+    timeout: float
+    proxies: dict[str, str]
+    verify: bool
+
+    # These override the class defaults
+    no_middleware: bool
+    use_mitm_when_active: bool
+
+    # Middleware specific
+    middl_max_retries: int
+    middl_skip_status_check: bool
+    middl_skip_redirects: bool
+    middl_custom_status_handling_function: Callable
+    middl_redirect_endpoint_stop: str
+    middl_redirect_endpoint_contains_stop: str
+    middl_statuses_to_skip: list[int | str]
+
+
+# noinspection PyProtectedMember,PyIncorrectDocstring
 class Client(ABC):
     """Interface for the client session classes."""
 
@@ -33,26 +58,6 @@ class Client(ABC):
 
     @abstractmethod
     def set_cookie(self, name, value, domain):
-        pass
-
-    @abstractmethod
-    def get(self, url: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def post(self, url: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def put(self, url: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def delete(self, url: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def options(self, url: str, **kwargs) -> Response:
         pass
 
     @abstractmethod
@@ -88,19 +93,160 @@ class Client(ABC):
     def from_json(self, data: dict, header_helper: HeaderHelper):
         pass
 
-    def request(self, method: str, url: str, **kwargs):
-        if method == "GET":
-            return self.get(url, **kwargs)
-        elif method == "POST":
-            return self.post(url, **kwargs)
-        elif method == "PUT":
-            return self.put(url, **kwargs)
-        elif method == "DELETE":
-            return self.delete(url, **kwargs)
-        elif method == "OPTIONS":
-            return self.options(url, **kwargs)
-        else:
-            raise ValueError(f"Invalid method type: {method}")
+    @abstractmethod
+    def request(
+            self,
+            method: str,
+            url: str,
+            params: Optional[dict[str, Any]] = None,
+            data: Optional[Any] = None,
+            headers: Optional[dict[str, str]] = None,
+            cookies: Optional[dict[str, str]] = None,
+            json: Optional[Any] = None,
+            timeout: Optional[float] = None,
+            proxies: Optional[dict[str, str]] = None,
+    ) -> Response:
+        pass
+
+    def get(self, url: str, **kwargs: Unpack[RequestParams]) -> Response:
+        """
+        :param params: Query parameters to include in the request URL.
+        :param data: Data to send in the body of the request (usually for POST/PUT).
+        :param headers: Request headers to be included.
+        :param cookies: Cookies to include in the request.
+        :param json: JSON-serializable object to send as the request body.
+        :param timeout: Maximum time to wait for the response, in seconds.
+        :param proxies: Proxy mapping used for the request.
+        :param verify: Whether to verify the server's TLS certificate.
+
+        :param no_middleware: If True, bypass all middleware logic.
+        :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+
+        :param middl_max_retries: Maximum number of retry attempts through middleware.
+        :param middl_skip_status_check: If True, skip status code validation logic in middleware.
+        :param middl_skip_redirects: If True, bypass redirect-handling logic in middleware.
+        :param middl_custom_status_handling_function: Custom callable to handle specific status codes.
+            If this is present, then it will be the only function responsible with checking the status code.
+        :param middl_redirect_endpoint_stop: If the redirect URL exactly matches this, stop redirect handling.
+        :param middl_redirect_endpoint_contains_stop: If the redirect URL contains this substring, stop redirect handling.
+        :param middl_statuses_to_skip: List of status codes to skip in middleware status checking.
+
+
+         :returns: A `Response <Response>` object.
+        """
+        return self.request(method="GET", url=url, **kwargs)
+
+    def post(self, url: str, **kwargs: Unpack[RequestParams]) -> Response:
+        """
+        :param params: Query parameters to include in the request URL.
+        :param data: Data to send in the body of the request (usually for POST/PUT).
+        :param headers: Request headers to be included.
+        :param cookies: Cookies to include in the request.
+        :param json: JSON-serializable object to send as the request body.
+        :param timeout: Maximum time to wait for the response, in seconds.
+        :param proxies: Proxy mapping used for the request.
+        :param verify: Whether to verify the server's TLS certificate.
+
+        :param no_middleware: If True, bypass all middleware logic.
+        :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+
+        :param middl_max_retries: Maximum number of retry attempts through middleware.
+        :param middl_skip_status_check: If True, skip status code validation logic in middleware.
+        :param middl_skip_redirects: If True, bypass redirect-handling logic in middleware.
+        :param middl_custom_status_handling_function: Custom callable to handle specific status codes.
+            If this is present, then it will be the only function responsible with checking the status code.
+        :param middl_redirect_endpoint_stop: If the redirect URL exactly matches this, stop redirect handling.
+        :param middl_redirect_endpoint_contains_stop: If the redirect URL contains this substring, stop redirect handling.
+        :param middl_statuses_to_skip: List of status codes to skip in middleware status checking.
+
+
+         :returns: A `Response <Response>` object.
+        """
+        return self.request(method="POST", url=url, **kwargs)
+
+    def put(self, url: str, **kwargs: Unpack[RequestParams]) -> Response:
+        """
+        :param params: Query parameters to include in the request URL.
+        :param data: Data to send in the body of the request (usually for POST/PUT).
+        :param headers: Request headers to be included.
+        :param cookies: Cookies to include in the request.
+        :param json: JSON-serializable object to send as the request body.
+        :param timeout: Maximum time to wait for the response, in seconds.
+        :param proxies: Proxy mapping used for the request.
+        :param verify: Whether to verify the server's TLS certificate.
+
+        :param no_middleware: If True, bypass all middleware logic.
+        :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+
+        :param middl_max_retries: Maximum number of retry attempts through middleware.
+        :param middl_skip_status_check: If True, skip status code validation logic in middleware.
+        :param middl_skip_redirects: If True, bypass redirect-handling logic in middleware.
+        :param middl_custom_status_handling_function: Custom callable to handle specific status codes.
+            If this is present, then it will be the only function responsible with checking the status code.
+        :param middl_redirect_endpoint_stop: If the redirect URL exactly matches this, stop redirect handling.
+        :param middl_redirect_endpoint_contains_stop: If the redirect URL contains this substring, stop redirect handling.
+        :param middl_statuses_to_skip: List of status codes to skip in middleware status checking.
+
+
+         :returns: A `Response <Response>` object.
+        """
+        return self.request(method="PUT", url=url, **kwargs)
+
+    def delete(self, url: str, **kwargs: Unpack[RequestParams]) -> Response:
+        """
+        :param params: Query parameters to include in the request URL.
+        :param data: Data to send in the body of the request (usually for POST/PUT).
+        :param headers: Request headers to be included.
+        :param cookies: Cookies to include in the request.
+        :param json: JSON-serializable object to send as the request body.
+        :param timeout: Maximum time to wait for the response, in seconds.
+        :param proxies: Proxy mapping used for the request.
+        :param verify: Whether to verify the server's TLS certificate.
+
+        :param no_middleware: If True, bypass all middleware logic.
+        :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+
+        :param middl_max_retries: Maximum number of retry attempts through middleware.
+        :param middl_skip_status_check: If True, skip status code validation logic in middleware.
+        :param middl_skip_redirects: If True, bypass redirect-handling logic in middleware.
+        :param middl_custom_status_handling_function: Custom callable to handle specific status codes.
+            If this is present, then it will be the only function responsible with checking the status code.
+        :param middl_redirect_endpoint_stop: If the redirect URL exactly matches this, stop redirect handling.
+        :param middl_redirect_endpoint_contains_stop: If the redirect URL contains this substring, stop redirect handling.
+        :param middl_statuses_to_skip: List of status codes to skip in middleware status checking.
+
+
+         :returns: A `Response <Response>` object.
+        """
+        return self.request(method="DELETE", url=url, **kwargs)
+
+    def options(self, url: str, **kwargs: Unpack[RequestParams]) -> Response:
+        """
+        :param params: Query parameters to include in the request URL.
+        :param data: Data to send in the body of the request (usually for POST/PUT).
+        :param headers: Request headers to be included.
+        :param cookies: Cookies to include in the request.
+        :param json: JSON-serializable object to send as the request body.
+        :param timeout: Maximum time to wait for the response, in seconds.
+        :param proxies: Proxy mapping used for the request.
+        :param verify: Whether to verify the server's TLS certificate.
+
+        :param no_middleware: If True, bypass all middleware logic.
+        :param use_mitm_when_active: If True, use Man-in-the-Middle (MITM) proxy when active.
+
+        :param middl_max_retries: Maximum number of retry attempts through middleware.
+        :param middl_skip_status_check: If True, skip status code validation logic in middleware.
+        :param middl_skip_redirects: If True, bypass redirect-handling logic in middleware.
+        :param middl_custom_status_handling_function: Custom callable to handle specific status codes.
+            If this is present, then it will be the only function responsible with checking the status code.
+        :param middl_redirect_endpoint_stop: If the redirect URL exactly matches this, stop redirect handling.
+        :param middl_redirect_endpoint_contains_stop: If the redirect URL contains this substring, stop redirect handling.
+        :param middl_statuses_to_skip: List of status codes to skip in middleware status checking.
+
+
+         :returns: A `Response <Response>` object.
+        """
+        return self.request(method="OPTIONS", url=url, **kwargs)
 
     @property
     def cookies(self):

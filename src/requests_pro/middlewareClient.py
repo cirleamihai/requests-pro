@@ -104,12 +104,12 @@ class MiddlewareClient(Client, ABC):
         if kwargs.get('verify', None) is None:
             kwargs['verify'] = False
 
-        statuses_to_skip: list = kwargs.get('statuses_to_skip')
+        statuses_to_skip: list = kwargs.get('middl_statuses_to_skip')
         if statuses_to_skip:
             if isinstance(statuses_to_skip, int) or isinstance(statuses_to_skip, str):
-                kwargs['statuses_to_skip'] = [str(statuses_to_skip)]
+                kwargs['middl_statuses_to_skip'] = [str(statuses_to_skip)]
             else:
-                kwargs['statuses_to_skip'] = [str(status) for status in statuses_to_skip]
+                kwargs['middl_statuses_to_skip'] = [str(status) for status in statuses_to_skip]
 
     @staticmethod
     def _check_for_redirects(response, url: str):
@@ -152,23 +152,23 @@ class MiddlewareClient(Client, ABC):
                 self.delete_cookies([morsel.key])
                 self.set_cookie(name=morsel.key, value=morsel.value, domain=morsel['domain'])
 
-    def _middleware_request(self, request_method: Callable, url: str, max_retries=3, **kwargs):
+    def _middleware_request(self, request_method: Callable, url: str, middl_max_retries=3, **kwargs):
         """Wrapper around the request method to handle errors and retries."""
         errors = []
         retries = 0
-        skip_status_check = kwargs.pop('skip_status_check', False)
-        skip_redirects = kwargs.pop('skip_redirects', False)
-        custom_status_handling_function = kwargs.pop('custom_status_handling_function', None)
-        redirect_endpoint_stop = kwargs.pop('redirect_endpoint_stop', '')
-        redirect_endpoint_contains_stop = kwargs.pop('redirect_endpoint_contains_stop', '')
+        skip_status_check = kwargs.pop('middl_skip_status_check', False)
+        skip_redirects = kwargs.pop('middl_skip_redirects', False)
+        custom_status_handling_function = kwargs.pop('middl_custom_status_handling_function', None)
+        redirect_endpoint_stop = kwargs.pop('middl_redirect_endpoint_stop', '')
+        redirect_endpoint_contains_stop = kwargs.pop('middl_redirect_endpoint_contains_stop', '')
 
         # Processing the kwargs before passing them to the requests function
         self.process_kwargs(kwargs)
-        statuses_to_skip = kwargs.pop("statuses_to_skip", [])
+        statuses_to_skip = kwargs.pop("middl_statuses_to_skip", [])
 
-        while retries < max_retries:
+        while retries < middl_max_retries:
             try:
-                response = request_method(self, url, **kwargs)
+                response = request_method(self, url=url, **kwargs)
                 self._set_cookies(response)
 
                 # Check for redirects
@@ -206,5 +206,5 @@ class MiddlewareClient(Client, ABC):
                 errors.append(RequestException(message))
 
         raise RequestsGroupedError(
-            f"Failed to make the request in {max_retries} tries", errors
+            f"Failed to make the request in {middl_max_retries} tries", errors
         )
