@@ -1,5 +1,7 @@
 import random
 
+from utils.userAgentHandler import UserAgentHandler
+
 
 class HeaderTools:
     """
@@ -32,7 +34,7 @@ class HeaderTools:
         return ', '.join(accept_language_parts)
 
     @staticmethod
-    def get_random_user_agent(*args, **kwargs) -> dict:
+    def get_random_user_agent(client_identifier) -> dict:
         """
 
         Constructs a dictionary containing a realistic Chrome user agent string and
@@ -48,7 +50,7 @@ class HeaderTools:
 
         Example:
             >>> header_helper = HeaderHelper()
-            >>> headers = header_helper.get_random_user_agent()
+            >>> headers = header_helper.get_random_user_agent(client_identifier="128")
             >>> print(headers)
             {
                 "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -58,7 +60,7 @@ class HeaderTools:
             }
 
         """
-        return {}
+        return UserAgentHandler.get_user_agent_and_related_headers(client_identifier)
 
 
 class HeaderHelper(HeaderTools):

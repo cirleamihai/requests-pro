@@ -1,0 +1,314 @@
+{
+  "mac": [
+    {
+      "system_info": "Macintosh; Intel Mac OS X 12_3_1",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 11_6_5",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 11_5_2",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_15_7",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_14_6",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_13_6",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_12_6",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_11_6",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_10_5",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; Intel Mac OS X 10_9_5",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    }
+  ],
+  "win64": [
+    {
+      "system_info": "Windows NT 10.0; Win64; x64",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:92.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:91.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:90.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:89.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:88.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:87.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:86.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:85.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; Win64; x64; rv:84.0",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    }
+  ],
+  "win": [
+    {
+      "system_info": "Windows NT 10.0; Win32",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+
+    },
+    {
+      "system_info": "Windows NT 6.3; Win32",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 6.2; Win32",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    }
+  ],
+  "mac_arm64": [
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 12_3_1",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 12_1",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_6_5",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_5_2",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_4",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_3",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_2",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_1",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 11_0_1",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    },
+    {
+      "system_info": "Macintosh; ARM64 Mac OS X 10_15_7",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "macOS",
+      "mobile": false
+    }
+  ],
+  "win_arm64": [
+    {
+      "system_info": "Windows NT 10.0; ARM64; Surface Pro X",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Galaxy Book S",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Lenovo Flex 5G",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; HP Elite Folio",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Surface Go 2",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; ASUS NovaGo",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Lenovo Yoga C630",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; HP Envy x2",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Acer Spin 7",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    },
+    {
+      "system_info": "Windows NT 10.0; ARM64; Surface Pro X 2021",
+      "browser_naming": "Chrome",
+      "end_string": "Safari",
+      "platform": "Windows",
+      "mobile": false
+    }
+  ]
+}
