@@ -25,8 +25,7 @@ def request_through_middleware(func):
     """
     @functools.wraps(func)
     def wrapper(self, url: str, *args, **kwargs) -> Callable:
-        if kwargs.get("no_middleware"):
-            del kwargs["no_middleware"]
+        if kwargs.pop("no_middleware", self.no_middleware):
             return func(self, url, *args, **kwargs)
 
         return self._middleware_request(func, url, *args, **kwargs)

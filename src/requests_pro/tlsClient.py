@@ -53,6 +53,8 @@ class TLSClient(MiddlewareClient):
             proxies: dict = None,
             headers: dict = None,
             header_helper: HeaderHelper = None,
+            no_middleware: bool = False,
+            use_mitm_when_active: bool = True,
             client_identifier: ClientIdentifiers = "chrome_120",
             ja3_string: Optional[str] = None,
             h2_settings: Optional[Dict[str, int]] = None,
@@ -79,7 +81,7 @@ class TLSClient(MiddlewareClient):
 
         Currently using chrome 120 which is the default. You can use whatever client_identifier you may want to.
         """
-        super().__init__()
+        super().__init__(no_middleware, use_mitm_when_active)
         self.client_identifier = client_identifier
 
         # Getting the header order from the header helper
@@ -189,13 +191,20 @@ class TLSClient(MiddlewareClient):
             'cookies': self._serialize_cookies(),
             'proxies': self.proxies,
             'header_helper': self.header_helper.__class__.__name__,
+            'no_middleware': self.no_middleware,
+            'use_mitm_when_active': self.use_mitm_when_active,
         }
         return data
 
     @classmethod
     def from_json(cls, data: dict, header_helper: HeaderHelper):
         """Create a TLSClient from JSON data."""
-        instance = cls(header_helper=header_helper, client_identifier=data.get('client_identifier', "chrome_120"))
+        instance = cls(
+            header_helper=header_helper,
+            client_identifier=data.get('client_identifier', "chrome_120"),
+            no_middleware=data.get('no_middleware', False),
+            use_mitm_when_active=data.get('use_mitm_when_active', True)
+        )
         if data.get("client_identifier"):
             instance.headers.update(data['headers'])
         instance.proxies = data.get('proxies', {})

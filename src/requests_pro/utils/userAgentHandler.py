@@ -92,3 +92,34 @@ class UserAgentHandler:
             'User-Agent': user_agent_info['user_agent'],
             'Sec-Ch-Ua-Platform': f'"{platform}"',
         }
+
+if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+
+    # @todo: Comment this out in production
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+    with resources.open_text("requests_pro.files", "chrome_version_info.json") as f:
+        version_info = json.load(f)
+
+    with resources.open_text("requests_pro.files", "chrome_subsystem_info.json") as f:
+        subsystem_info = json.load(f)
+
+    good_version_info = {}
+    platforms = []
+    for version_number, version_details in version_info.items():
+        good_version_info[version_number] = {}
+        for channel, versions in version_details.items():
+            good_version_info[version_number][channel] = []
+            for version in versions:
+                platform = version['platform']
+                if platform in subsystem_info:
+                    good_version_info[version_number][channel].append(version)
+                    if platform not in platforms:
+                        platforms.append(platform)
+
+
+    with open('../files/chrome_version_info.json', 'w') as f:
+        json.dump(good_version_info, f, indent=4)
+
+

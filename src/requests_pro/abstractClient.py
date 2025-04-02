@@ -10,8 +10,10 @@ from utils.proxiesHandler import ProxiesHandler
 class Client(ABC):
     """Interface for the client session classes."""
 
-    def __init__(self):
+    def __init__(self, no_middleware: bool = False, use_mitm_when_active: bool = True):
         self.session = None
+        self.no_middleware = no_middleware
+        self.use_mitm_when_active = use_mitm_when_active
 
     @abstractmethod
     def update_headers(self, new_headers: dict):

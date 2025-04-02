@@ -1,7 +1,7 @@
 import random
 import socket
 
-CHARLES_CONFIGURATION = ('127.0.0.1', 8888, 0.01)
+CHARLES_CONFIGURATION = ('127.0.0.1', 8888, 0.005)
 
 
 def is_charles_running():

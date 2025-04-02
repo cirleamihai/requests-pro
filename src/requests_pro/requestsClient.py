@@ -17,7 +17,7 @@ def kwargs_processing(func):
         if 'verify' in kwargs:
             kwargs['verify'] = False
 
-            if is_charles_running():
+            if (kwargs.pop('use_mitm_when_active', self.use_mitm_when_active)) and is_charles_running():
                 kwargs['proxies'] = {
                     "http": "http://127.0.0.1:8888",
                     "https": "http://127.0.0.1:8888",
@@ -40,8 +40,10 @@ class RequestsClient(MiddlewareClient):
             proxies: dict = None,
             headers: dict = None,
             header_helper: HeaderHelper = None,
+            no_middleware: bool = False,
+            use_mitm_when_active: bool = True,
     ):
-        super().__init__()
+        super().__init__(no_middleware, use_mitm_when_active)
         self.session = Session()
         self.header_helper: HeaderHelper = header_helper or HeaderHelper()
         self.client_identifier = "128"
@@ -114,6 +116,8 @@ class RequestsClient(MiddlewareClient):
             'cookies': self._serialize_cookies(),
             'proxies': self.proxies,
             'header_helper': self.header_helper.__class__.__name__,
+            'no_middleware': self.no_middleware,
+            'use_mitm_when_active': self.use_mitm_when_active,
         }
 
         return data
@@ -121,7 +125,11 @@ class RequestsClient(MiddlewareClient):
     @classmethod
     def from_json(cls, data: dict, header_helper: HeaderHelper):
         """Create a TLSClientSession from JSON data."""
-        instance = cls(header_helper=header_helper)
+        instance = cls(
+            header_helper=header_helper,
+            no_middleware=data.get('no_middleware', False),
+            use_mitm_when_active=data.get('use_mitm_when_active', True)
+        )
         instance.headers.update(data['headers'])
         instance.proxies = data['proxies']
         instance._deserialize_cookies(data['cookies'])

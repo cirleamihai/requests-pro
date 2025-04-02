@@ -6469,8 +6469,7 @@
                 "platform": "mac_arm64",
                 "version": "126.0.6423.1"
             }
-        ],
-        "ltc": []
+        ]
     },
     "124": {
         "extended": [
@@ -16124,9 +16123,7 @@
                 "platform": "mac_arm64",
                 "version": "120.0.6046.1"
             }
-        ],
-        "lts": [],
-        "ltc": []
+        ]
     },
     "118": {
         "extended": [
