@@ -1,13 +1,12 @@
 import uuid
-from typing import Optional, Dict, List, Unpack
+from typing import Dict, List, Optional, Unpack
 from urllib.parse import quote
-
-from tls_client import Session as tlsClient
-from tls_client.settings import ClientIdentifiers
 
 from abstractClient import RequestParams
 from middlewareClient import MiddlewareClient, request_through_middleware
 from response import Response
+from tls_client import Session as tlsClient
+from tls_client.settings import ClientIdentifiers
 from utils.headerTools import HeaderHelper
 from utils.httpsUtils import is_charles_running
 
@@ -22,20 +21,22 @@ def kwargs_processing(func):
 
     def wrapper(self, url: str, **kwargs):
         # Rename the timeout keyword to timeout_seconds
-        if 'timeout' in kwargs:
-            kwargs['timeout_seconds'] = kwargs.pop('timeout')
+        if "timeout" in kwargs:
+            kwargs["timeout_seconds"] = kwargs.pop("timeout")
 
-        if not kwargs.get('verify'):
-            kwargs['insecure_skip_verify'] = not kwargs.pop('verify', False)
+        if not kwargs.get("verify"):
+            kwargs["insecure_skip_verify"] = not kwargs.pop("verify", False)
 
-            if (kwargs.pop('use_mitm_when_active', self.use_mitm_when_active)) and is_charles_running():
-                kwargs['proxy'] = {
+            if (
+                kwargs.pop("use_mitm_when_active", self.use_mitm_when_active)
+            ) and is_charles_running():
+                kwargs["proxy"] = {
                     "http": "http://127.0.0.1:8888",
                     "https": "http://127.0.0.1:8888",
                 }
 
         # Encoding the url
-        encoded_url = quote(url, safe=':/?&=%.,/;')
+        encoded_url = quote(url, safe=":/?&=%.,/;")
 
         return func(self, url=encoded_url, **kwargs)
 
@@ -51,30 +52,30 @@ class TLSClient(MiddlewareClient):
     """
 
     def __init__(
-            self,
-            proxies: dict = None,
-            headers: dict = None,
-            header_helper: HeaderHelper = None,
-            no_middleware: bool = False,
-            use_mitm_when_active: bool = True,
-            client_identifier: ClientIdentifiers = "chrome_120",
-            ja3_string: Optional[str] = None,
-            h2_settings: Optional[Dict[str, int]] = None,
-            h2_settings_order: Optional[List[str]] = None,
-            supported_signature_algorithms: Optional[List[str]] = None,
-            supported_delegated_credentials_algorithms: Optional[List[str]] = None,
-            supported_versions: Optional[List[str]] = None,
-            key_share_curves: Optional[List[str]] = None,
-            cert_compression_algo: str = None,
-            additional_decode: str = None,
-            pseudo_header_order: Optional[List[str]] = None,
-            connection_flow: Optional[int] = None,
-            priority_frames: Optional[list] = None,
-            header_priority: Optional[List[str]] = None,
-            force_http1: Optional = False,
-            catch_panics: Optional = False,
-            debug: Optional = False,
-            certificate_pinning: Optional[Dict[str, List[str]]] = None,
+        self,
+        proxies: dict = None,
+        headers: dict = None,
+        header_helper: HeaderHelper = None,
+        no_middleware: bool = False,
+        use_mitm_when_active: bool = True,
+        client_identifier: ClientIdentifiers = "chrome_120",
+        ja3_string: Optional[str] = None,
+        h2_settings: Optional[Dict[str, int]] = None,
+        h2_settings_order: Optional[List[str]] = None,
+        supported_signature_algorithms: Optional[List[str]] = None,
+        supported_delegated_credentials_algorithms: Optional[List[str]] = None,
+        supported_versions: Optional[List[str]] = None,
+        key_share_curves: Optional[List[str]] = None,
+        cert_compression_algo: str = None,
+        additional_decode: str = None,
+        pseudo_header_order: Optional[List[str]] = None,
+        connection_flow: Optional[int] = None,
+        priority_frames: Optional[list] = None,
+        header_priority: Optional[List[str]] = None,
+        force_http1: Optional = False,
+        catch_panics: Optional = False,
+        debug: Optional = False,
+        certificate_pinning: Optional[Dict[str, List[str]]] = None,
     ):
         """
         Currently using this tls client as a wrapper around the requests library:
@@ -156,21 +157,12 @@ class TLSClient(MiddlewareClient):
 
     @request_through_middleware
     @kwargs_processing
-    def request(
-            self,
-            method: str,
-            url: str,
-            **kwargs
-    ) -> Response:
-        return self.session.execute_request(
-            method=method,
-            url=url,
-            **kwargs
-        )
+    def request(self, method: str, url: str, **kwargs) -> Response:
+        return self.session.execute_request(method=method, url=url, **kwargs)
 
     def post(self, url: str, **kwargs: Unpack[RequestParams]):
-        if 'data' in kwargs and isinstance(kwargs['data'], dict):
-            kwargs['data'] = '&'.join([f"{k}={v}" for k, v in kwargs['data'].items()])
+        if "data" in kwargs and isinstance(kwargs["data"], dict):
+            kwargs["data"] = "&".join([f"{k}={v}" for k, v in kwargs["data"].items()])
 
         return self.request(method="POST", url=url, **kwargs)
 
@@ -180,14 +172,14 @@ class TLSClient(MiddlewareClient):
     def to_json(self):
         """Serialize the session to a JSON-serializable dictionary."""
         data = {
-            'sessionClientType': 'TLSClient',
-            'client_identifier': self.client_identifier,
-            'headers': dict(self.headers),
-            'cookies': self._serialize_cookies(),
-            'proxies': self.proxies,
-            'header_helper': self.header_helper.__class__.__name__,
-            'no_middleware': self.no_middleware,
-            'use_mitm_when_active': self.use_mitm_when_active,
+            "sessionClientType": "TLSClient",
+            "client_identifier": self.client_identifier,
+            "headers": dict(self.headers),
+            "cookies": self._serialize_cookies(),
+            "proxies": self.proxies,
+            "header_helper": self.header_helper.__class__.__name__,
+            "no_middleware": self.no_middleware,
+            "use_mitm_when_active": self.use_mitm_when_active,
         }
         return data
 
@@ -196,18 +188,23 @@ class TLSClient(MiddlewareClient):
         """Create a TLSClient from JSON data."""
         instance = cls(
             header_helper=header_helper,
-            client_identifier=data.get('client_identifier', "chrome_120"),
-            no_middleware=data.get('no_middleware', False),
-            use_mitm_when_active=data.get('use_mitm_when_active', True)
+            client_identifier=data.get("client_identifier", "chrome_120"),
+            no_middleware=data.get("no_middleware", False),
+            use_mitm_when_active=data.get("use_mitm_when_active", True),
         )
         if data.get("client_identifier"):
-            instance.headers.update(data['headers'])
-        instance.proxies = data.get('proxies', {})
-        instance._deserialize_cookies(data.get('cookies', {}))
+            instance.headers.update(data["headers"])
+        instance.proxies = data.get("proxies", {})
+        instance._deserialize_cookies(data.get("cookies", {}))
 
         return instance
 
-    def reset_client(self, proxies: dict = None, proxy_filename_path: str = "", use_proxies: bool = True):
+    def reset_client(
+        self,
+        proxies: dict = None,
+        proxy_filename_path: str = "",
+        use_proxies: bool = True,
+    ):
         self.rotate_ip(proxies, proxy_filename_path)
         proxies = self.proxies if use_proxies else ""
         old_session = self.session
@@ -238,7 +235,9 @@ class TLSClient(MiddlewareClient):
         # Close the old session
         old_session.close()
 
-        preset_headers = self.header_helper.get_headers(client_identifier=self.client_identifier)
+        preset_headers = self.header_helper.get_headers(
+            client_identifier=self.client_identifier
+        )
         self.session.headers.update(preset_headers)
         self.proxies = proxies
 

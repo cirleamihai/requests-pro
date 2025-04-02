@@ -2,7 +2,9 @@ import requests
 
 
 class HttpError(Exception):
-    def __init__(self, message: str, response_str: str, response_obj: requests.Response):
+    def __init__(
+        self, message: str, response_str: str, response_obj: requests.Response
+    ):
         super().__init__(message)
         self.message = message
         self.response_str = response_str

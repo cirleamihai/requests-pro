@@ -36,10 +36,8 @@
 # tls-client: https://github.com/bogdanfinn/tls-client
 # requests: https://github.com/psf/requests
 
-from tlsClient import TLSClient
-from requestsClient import RequestsClient
 from middlewareClient import MiddlewareClient
-
-from sessionFactory import SessionFactory
-
+from requestsClient import RequestsClient
 from response import Response
+from sessionFactory import SessionFactory
+from tlsClient import TLSClient

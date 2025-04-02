@@ -32,35 +32,42 @@ class UserAgentHandler:
         with resources.open_text("requests_pro.files", "chrome_version_info.json") as f:
             version_info = json.load(f)
 
-        with resources.open_text("requests_pro.files", "chrome_subsystem_info.json") as f:
+        with resources.open_text(
+            "requests_pro.files", "chrome_subsystem_info.json"
+        ) as f:
             subsystem_info = json.load(f)
 
-        if not version_info or not subsystem_info: raise ValueError("Not enough data to generate user agent headers.")
+        if not version_info or not subsystem_info:
+            raise ValueError("Not enough data to generate user agent headers.")
 
         # Getting a version info that our tls client can emulate
-        client_identifier = client_identifier or random.choice(list(version_info.keys()))
-        if 'chrome' in client_identifier:
-            client_identifier = client_identifier.split('chrome_')[1].split('_')[0]
+        client_identifier = client_identifier or random.choice(
+            list(version_info.keys())
+        )
+        if "chrome" in client_identifier:
+            client_identifier = client_identifier.split("chrome_")[1].split("_")[0]
 
         random_channel = random.choice(list(version_info[client_identifier].keys()))
         random_version = random.choice(version_info[client_identifier][random_channel])
-        platform = random_version['platform']
-        random_version = random_version['version']
+        platform = random_version["platform"]
+        random_version = random_version["version"]
 
         random_subsystem = random.choice(subsystem_info[platform])
-        system = random_subsystem['system_info']
-        browser_naming = random_subsystem['browser_naming']
-        end_string = random_subsystem['end_string']
-        webkit_version = '537.36'
+        system = random_subsystem["system_info"]
+        browser_naming = random_subsystem["browser_naming"]
+        end_string = random_subsystem["end_string"]
+        webkit_version = "537.36"
 
-        user_agent = (f"Mozilla/5.0 ({system}) AppleWebKit/{webkit_version} (KHTML, like Gecko)"
-                      f" {browser_naming}/{random_version} {end_string}/{webkit_version}")
+        user_agent = (
+            f"Mozilla/5.0 ({system}) AppleWebKit/{webkit_version} (KHTML, like Gecko)"
+            f" {browser_naming}/{random_version} {end_string}/{webkit_version}"
+        )
 
         return {
             "user_agent": user_agent,
             "version": client_identifier,
-            "platform": random_subsystem['platform'],
-            "mobile": random_subsystem['mobile']
+            "platform": random_subsystem["platform"],
+            "mobile": random_subsystem["mobile"],
         }
 
     @staticmethod
@@ -82,16 +89,17 @@ class UserAgentHandler:
             \n\t    - "sec-ch-ua-platform" (str): The `sec-ch-ua-platform` header indicating the platform (e.g., "Windows", "Linux", "macOS").
         """
         user_agent_info = UserAgentHandler.create_user_agent(client_identifier)
-        version = user_agent_info['version']
-        is_mobile = user_agent_info['mobile']
-        platform = user_agent_info['platform']
+        version = user_agent_info["version"]
+        is_mobile = user_agent_info["mobile"]
+        platform = user_agent_info["platform"]
 
         return {
-            'Sec-Ch-Ua': f'"Google Chrome";v="{version}", "Chromium";v="{version}", "Not)A;Brand";v="99"',
-            'Sec-Ch-Ua-Mobile': '?1' if is_mobile else '?0',
-            'User-Agent': user_agent_info['user_agent'],
-            'Sec-Ch-Ua-Platform': f'"{platform}"',
+            "Sec-Ch-Ua": f'"Google Chrome";v="{version}", "Chromium";v="{version}", "Not)A;Brand";v="99"',
+            "Sec-Ch-Ua-Mobile": "?1" if is_mobile else "?0",
+            "User-Agent": user_agent_info["user_agent"],
+            "Sec-Ch-Ua-Platform": f'"{platform}"',
         }
+
 
 if __name__ == "__main__":
     import sys
@@ -112,14 +120,11 @@ if __name__ == "__main__":
         for channel, versions in version_details.items():
             good_version_info[version_number][channel] = []
             for version in versions:
-                platform = version['platform']
+                platform = version["platform"]
                 if platform in subsystem_info:
                     good_version_info[version_number][channel].append(version)
                     if platform not in platforms:
                         platforms.append(platform)
 
-
-    with open('../files/chrome_version_info.json', 'w') as f:
+    with open("../files/chrome_version_info.json", "w") as f:
         json.dump(good_version_info, f, indent=4)
-
-

@@ -6,12 +6,11 @@ from typing import Callable
 
 import requests
 import urllib3
-from requests import HTTPError, RequestException
-from tls_client.exceptions import TLSClientExeption
-
 from abstractClient import Client
 from errors.httpErrors import (AntiBotBlockError, NotFoundError,
                                RequestsGroupedError, UnauthorizedError)
+from requests import HTTPError, RequestException
+from tls_client.exceptions import TLSClientExeption
 
 urllib3.disable_warnings()
 
@@ -29,7 +28,8 @@ def request_through_middleware(func):
     def wrapper(self, url: str, *args, **kwargs) -> Callable:
         if kwargs.pop("no_middleware", self.no_middleware):
             for key in kwargs.copy().keys():
-                if key.startswith("middl_"): kwargs.pop(key)
+                if key.startswith("middl_"):
+                    kwargs.pop(key)
 
             return func(self, url, *args, **kwargs)
 
@@ -45,8 +45,11 @@ class MiddlewareClient(Client, ABC):
     """
 
     @staticmethod
-    def check_response_status(response: requests.Response, custom_status_handling_function: Callable = None,
-                              statuses_to_skip: list = None):
+    def check_response_status(
+        response: requests.Response,
+        custom_status_handling_function: Callable = None,
+        statuses_to_skip: list = None,
+    ):
         """
         Checks the response status and raises an error if it is not 200.
 
@@ -69,24 +72,26 @@ class MiddlewareClient(Client, ABC):
                 raise AntiBotBlockError(
                     message="Blocked by AntiBot",
                     response_str=response.text,
-                    response_obj=response
+                    response_obj=response,
                 )
 
             elif response.status_code == 401:
                 raise UnauthorizedError(
                     message="Unauthorized",
                     response_str=response.text,
-                    response_obj=response
+                    response_obj=response,
                 )
 
             elif response.status_code == 404:
                 raise NotFoundError(
                     message="Page not found",
                     response_str=response.text,
-                    response_obj=response
+                    response_obj=response,
                 )
 
-            raise requests.exceptions.HTTPError(f"Response status code is not 200 [{response.status_code}]")
+            raise requests.exceptions.HTTPError(
+                f"Response status code is not 200 [{response.status_code}]"
+            )
 
     @staticmethod
     def process_kwargs(kwargs: dict):
@@ -98,23 +103,25 @@ class MiddlewareClient(Client, ABC):
         kwargs.pop("no_middleware", None)
 
         # set the default timeout to 20 seconds
-        if not kwargs.get('timeout'):
-            kwargs['timeout'] = 5
+        if not kwargs.get("timeout"):
+            kwargs["timeout"] = 5
 
         # do not allow redirects for requests, as we're handling them manually in order to fix the
         # Florian TLS bug that doesn't correctly encode the redirect link
-        kwargs['allow_redirects'] = False
+        kwargs["allow_redirects"] = False
 
         # Skip verifying the SSL certificate by default in order to proxy through Charles
-        if kwargs.get('verify', None) is None:
-            kwargs['verify'] = False
+        if kwargs.get("verify", None) is None:
+            kwargs["verify"] = False
 
-        statuses_to_skip: list = kwargs.get('middl_statuses_to_skip')
+        statuses_to_skip: list = kwargs.get("middl_statuses_to_skip")
         if statuses_to_skip:
             if isinstance(statuses_to_skip, int) or isinstance(statuses_to_skip, str):
-                kwargs['middl_statuses_to_skip'] = [str(statuses_to_skip)]
+                kwargs["middl_statuses_to_skip"] = [str(statuses_to_skip)]
             else:
-                kwargs['middl_statuses_to_skip'] = [str(status) for status in statuses_to_skip]
+                kwargs["middl_statuses_to_skip"] = [
+                    str(status) for status in statuses_to_skip
+                ]
 
     @staticmethod
     def _check_for_redirects(response, url: str):
@@ -122,14 +129,18 @@ class MiddlewareClient(Client, ABC):
         old_url = url
 
         if 300 <= response.status_code <= 399:
-            url = response.headers.get('Location')
+            url = response.headers.get("Location")
             redirected = True
 
             if url is None:
                 redirected = False
 
             else:
-                base_url = old_url.split('://')[0] + '://' + old_url.split('://')[1].split('/')[0]
+                base_url = (
+                    old_url.split("://")[0]
+                    + "://"
+                    + old_url.split("://")[1].split("/")[0]
+                )
 
                 if not url.startswith("/"):
                     url = "/" + url
@@ -149,7 +160,9 @@ class MiddlewareClient(Client, ABC):
         Example:
             self._set_cookies(response)
         """
-        set_cookie_header = response.headers.get('Set-Cookie') or response.headers.get('set-cookie')
+        set_cookie_header = response.headers.get("Set-Cookie") or response.headers.get(
+            "set-cookie"
+        )
 
         if not set_cookie_header:
             return
@@ -166,17 +179,25 @@ class MiddlewareClient(Client, ABC):
                     continue
 
                 self.delete_cookies([morsel.key])
-                self.set_cookie(name=morsel.key, value=morsel.value, domain=morsel['domain'])
+                self.set_cookie(
+                    name=morsel.key, value=morsel.value, domain=morsel["domain"]
+                )
 
-    def _middleware_request(self, request_method: Callable, url: str, middl_max_retries=3, **kwargs):
+    def _middleware_request(
+        self, request_method: Callable, url: str, middl_max_retries=3, **kwargs
+    ):
         """Wrapper around the request method to handle errors and retries."""
         errors = []
         retries = 0
-        skip_status_check = kwargs.pop('middl_skip_status_check', False)
-        skip_redirects = kwargs.pop('middl_skip_redirects', False)
-        custom_status_handling_function = kwargs.pop('middl_custom_status_handling_function', None)
-        redirect_endpoint_stop = kwargs.pop('middl_redirect_endpoint_stop', '')
-        redirect_endpoint_contains_stop = kwargs.pop('middl_redirect_endpoint_contains_stop', '')
+        skip_status_check = kwargs.pop("middl_skip_status_check", False)
+        skip_redirects = kwargs.pop("middl_skip_redirects", False)
+        custom_status_handling_function = kwargs.pop(
+            "middl_custom_status_handling_function", None
+        )
+        redirect_endpoint_stop = kwargs.pop("middl_redirect_endpoint_stop", "")
+        redirect_endpoint_contains_stop = kwargs.pop(
+            "middl_redirect_endpoint_contains_stop", ""
+        )
 
         # Processing the kwargs before passing them to the requests function
         self.process_kwargs(kwargs)
@@ -194,12 +215,21 @@ class MiddlewareClient(Client, ABC):
                 url, redirected = self._check_for_redirects(response, url)
 
                 if not skip_status_check:
-                    self.check_response_status(response, custom_status_handling_function, statuses_to_skip)
+                    self.check_response_status(
+                        response, custom_status_handling_function, statuses_to_skip
+                    )
 
-                if (redirected and not skip_redirects and url != redirect_endpoint_stop
-                        and not (redirect_endpoint_contains_stop and redirect_endpoint_contains_stop in url)):
-                    if 'params' in kwargs:
-                        del kwargs['params']
+                if (
+                    redirected
+                    and not skip_redirects
+                    and url != redirect_endpoint_stop
+                    and not (
+                        redirect_endpoint_contains_stop
+                        and redirect_endpoint_contains_stop in url
+                    )
+                ):
+                    if "params" in kwargs:
+                        del kwargs["params"]
                     continue
 
                 return response

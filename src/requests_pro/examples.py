@@ -1,12 +1,11 @@
 import json
+import sys
+from pathlib import Path
 
 from errors.httpErrors import RequestsGroupedError
 from requestsClient import RequestsClient
 from sessionFactory import SessionFactory
 from tlsClient import TLSClient
-import sys
-from pathlib import Path
-
 from utils.headerTools import HeaderHelper
 
 # @todo: Comment this out in production
@@ -69,7 +68,9 @@ def simple_get_request():
 def simple_post_request():
     # Simple Middlewared Requests Client Example
     requests_client_example = RequestsClient()
-    response = requests_client_example.post("https://httpbin.org/post", json={"key": "value"}, data="hey")
+    response = requests_client_example.post(
+        "https://httpbin.org/post", json={"key": "value"}, data="hey"
+    )
     print(response.json())
 
     # You can reset the client to get new headers
@@ -99,7 +100,7 @@ def advanced_tls_configuration():
         h2_settings={"SETTINGS_MAX_CONCURRENT_STREAMS": 100},
         supported_versions=["TLSv1.2", "TLSv1.3"],
         # We also do not want to proxy any requests anymore through charles, even if it's active
-        use_mitm_when_active=False
+        use_mitm_when_active=False,
     )
     response = client.get("https://httpbin.org/get")
     print("Advanced TLS config response status:", response.status_code)
@@ -117,7 +118,9 @@ def middleware_dealing_with_status_codes():
 
     def custom_status_code_handler(resp):
         if resp.status_code == 202:
-            raise Exception("This is a custom exception that happens for this status code")
+            raise Exception(
+                "This is a custom exception that happens for this status code"
+            )
 
         if resp.status_code != 200:
             # This time, 404 is ok
@@ -134,7 +137,7 @@ def middleware_dealing_with_status_codes():
     # Running this will not show any error
     response = client.get(
         "https://httpbin.org/status/404",
-        middl_custom_status_handling_function=custom_status_code_handler
+        middl_custom_status_handling_function=custom_status_code_handler,
     )
     print(response.status_code)
 
@@ -142,15 +145,12 @@ def middleware_dealing_with_status_codes():
     # _ = client.get("https://httpbin.org/status/404")
 
     # Skip the status check
-    _ = client.get(
-        "https://httpbin.org/status/404",
-        middl_skip_status_check=True
-    )
+    _ = client.get("https://httpbin.org/status/404", middl_skip_status_check=True)
 
     # Skip only some specific status codes when checking the status codes
     _ = client.get(
         "https://httpbin.org/status/404",
-        middl_statuses_to_skip=[404, "202"]  # Transforms integers into strings
+        middl_statuses_to_skip=[404, "202"],  # Transforms integers into strings
         # middl_statuses_to_skip=404    # <- This will also work, given it's a single status code
     )
 
@@ -179,7 +179,7 @@ def dealing_with_redirects():
 
     response = client.get(
         "https://httpbin.org/redirect/5",
-        middl_redirect_endpoint_contains_stop="redirect/2"
+        middl_redirect_endpoint_contains_stop="redirect/2",
     )
     # This will stop once it reaches the endpoint that contains redirect/2
     # In this case, it goes like this:
@@ -193,7 +193,7 @@ def dealing_with_redirects():
 
     response = client.get(
         "https://httpbin.org/redirect/5",
-        middl_redirect_endpoint_stop="https://httpbin.org/relative-redirect/1"
+        middl_redirect_endpoint_stop="https://httpbin.org/relative-redirect/1",
     )
     # This will stop once it reaches the endpoint that is exactly https://httpbin.org/relative-redirect/1
     # In this case, it goes like this:
@@ -233,10 +233,7 @@ def header_override_example():
     print("Default headers:")
     print(client.headers)
 
-    custom_headers = {
-        "User-Agent": "MyCustomAgent/1.0",
-        "X-Debug-Token": "abc123"
-    }
+    custom_headers = {"User-Agent": "MyCustomAgent/1.0", "X-Debug-Token": "abc123"}
 
     print("Request with custom headers:")
     response = client.get("https://httpbin.org/headers", headers=custom_headers)
@@ -246,7 +243,7 @@ def header_override_example():
 def proxy_usage_example():
     proxy = {  # This is an example of a proxy configuration
         "http": "http://domain:port[@username:password]",
-        "https": "http://domain:port[@username:password]"
+        "https": "http://domain:port[@username:password]",
     }
     client = TLSClient(proxies=proxy, use_mitm_when_active=False)
     try:
@@ -261,7 +258,7 @@ def using_session_factory():
     """
     Create a default RequestsClient using the factory.
     """
-    client = SessionFactory.create_client(client_type='requests')
+    client = SessionFactory.create_client(client_type="requests")
     response = client.get("https://httpbin.org/get")
     print("Response (requests):", response.status_code, response.text)
     print(json.dumps(client.to_json(), indent=2))
@@ -275,10 +272,7 @@ def client_with_proxy_file():
     """
 
     proxy_file = "/your/absolute/path/to/proxies.txt"
-    client = SessionFactory.create_client(
-        client_type='tls',
-        proxy_file_path=proxy_file
-    )
+    client = SessionFactory.create_client(client_type="tls", proxy_file_path=proxy_file)
     response = client.get("https://httpbin.org/ip")
     print("Proxied IP:", response.json())
     client.close()
@@ -288,14 +282,8 @@ def client_with_direct_proxy():
     """
     Create a RequestsClient with a manually provided proxy dictionary.
     """
-    proxy_dict = {
-        "http": "http://127.0.0.1:8080",
-        "https": "http://127.0.0.1:8080"
-    }
-    client = SessionFactory.create_client(
-        client_type='requests',
-        proxy_dict=proxy_dict
-    )
+    proxy_dict = {"http": "http://127.0.0.1:8080", "https": "http://127.0.0.1:8080"}
+    client = SessionFactory.create_client(client_type="requests", proxy_dict=proxy_dict)
     response = client.get("https://httpbin.org/ip")
     print("Proxied IP:", response.json())
     client.close()
@@ -311,8 +299,7 @@ def client_with_custom_header_helper():
 
     custom_header_helper = MyNewCustomHeaderHelper()
     client = SessionFactory.create_client(
-        client_type='tls',
-        header_helper=custom_header_helper
+        client_type="tls", header_helper=custom_header_helper
     )
 
     print("Headers used:", client.headers)
@@ -329,15 +316,15 @@ def create_client_from_json():
             "Connection": "keep-alive",
             "Accept-Language": "pt-PT, zh-CN;q=0.6",
             "Sec-GPC": "1",
-            "Sec-Ch-Ua": "\"Google Chrome\";v=\"128\", \"Chromium\";v=\"128\", \"Not)A;Brand\";v=\"99\"",
+            "Sec-Ch-Ua": '"Google Chrome";v="128", "Chromium";v="128", "Not)A;Brand";v="99"',
             "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": "\"macOS\""
+            "Sec-Ch-Ua-Platform": '"macOS"',
         },
         "cookies": [],
         "proxies": {},
         "header_helper": "HeaderHelper",
         "no_middleware": False,
-        "use_mitm_when_active": True
+        "use_mitm_when_active": True,
     }
     client = SessionFactory.from_json(json_alike_py_dict)
     print("Client created:", client)

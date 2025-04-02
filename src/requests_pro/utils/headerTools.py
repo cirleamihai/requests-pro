@@ -11,10 +11,28 @@ class HeaderTools:
     Helpful when it comes to header order, header manipulation,
     and header extraction.
     """
+
     language_codes = [
-        'en-US', 'en-GB', 'fr-FR', 'fr-CA', 'es-ES', 'es-MX', 'de-DE',
-        'it-IT', 'pt-PT', 'pt-BR', 'ru-RU', 'zh-CN', 'zh-TW', 'ja-JP',
-        'ko-KR', 'ar-SA', 'hi-IN', 'tr-TR', 'nl-NL', 'sv-SE'
+        "en-US",
+        "en-GB",
+        "fr-FR",
+        "fr-CA",
+        "es-ES",
+        "es-MX",
+        "de-DE",
+        "it-IT",
+        "pt-PT",
+        "pt-BR",
+        "ru-RU",
+        "zh-CN",
+        "zh-TW",
+        "ja-JP",
+        "ko-KR",
+        "ar-SA",
+        "hi-IN",
+        "tr-TR",
+        "nl-NL",
+        "sv-SE",
     ]
 
     @staticmethod
@@ -26,12 +44,15 @@ class HeaderTools:
         """
         num_languages = random.randint(1, 5) if num_languages is None else num_languages
         selected_languages = random.sample(HeaderTools.language_codes, num_languages)
-        q_values = sorted([round(random.uniform(0.1, 1.0), 1) for _ in range(num_languages)], reverse=True)
+        q_values = sorted(
+            [round(random.uniform(0.1, 1.0), 1) for _ in range(num_languages)],
+            reverse=True,
+        )
         accept_language_parts = [
             f"{lang};q={q}" if q < 1 else lang
             for lang, q in zip(selected_languages, q_values)
         ]
-        return ', '.join(accept_language_parts)
+        return ", ".join(accept_language_parts)
 
     @staticmethod
     def get_random_user_agent(client_identifier) -> dict:

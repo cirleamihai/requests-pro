@@ -1,7 +1,7 @@
 import random
 import socket
 
-CHARLES_CONFIGURATION = ('127.0.0.1', 8888, 0.005)
+CHARLES_CONFIGURATION = ("127.0.0.1", 8888, 0.005)
 
 
 def is_charles_running():
@@ -23,5 +23,5 @@ def get_random_available_port(start=1024, end=49151) -> int:
     """
     while True:
         port = random.randint(start, end)
-        if not is_ip_port_taken(host='127.0.0.1', port=port):
+        if not is_ip_port_taken(host="127.0.0.1", port=port):
             return port

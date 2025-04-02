@@ -48,10 +48,10 @@ class SessionFactory:
 
     @staticmethod
     def process_client_kwargs(
-            proxy_file_path: str,
-            proxy_dict: dict,
-            header_helper: HeaderHelper,
-            kwargs: dict
+        proxy_file_path: str,
+        proxy_dict: dict,
+        header_helper: HeaderHelper,
+        kwargs: dict,
     ):
         """
         Processes and stores updated values to the kwargs before using them on instantiations.
@@ -63,20 +63,22 @@ class SessionFactory:
         """
         # Setting up the proxies
         if proxy_file_path or proxy_dict:
-            kwargs['proxies'] = proxy_dict or ProxiesHandler.get_proxy_dict(proxy_file_path)
+            kwargs["proxies"] = proxy_dict or ProxiesHandler.get_proxy_dict(
+                proxy_file_path
+            )
 
         # By default, have a random header order option.
         # To prevent detection, each website should have a different class
-        kwargs['header_helper'] = header_helper or HeaderHelper()
+        kwargs["header_helper"] = header_helper or HeaderHelper()
 
     @staticmethod
     def create_client(
-            client_type: str = 'requests',
-            proxy_file_path: str = None,
-            proxy_dict: dict = None,
-            header_helper: HeaderHelper = None,
-            no_middleware: bool = False,
-            use_mitm_when_active: bool = True,
+        client_type: str = "requests",
+        proxy_file_path: str = None,
+        proxy_dict: dict = None,
+        header_helper: HeaderHelper = None,
+        no_middleware: bool = False,
+        use_mitm_when_active: bool = True,
     ) -> Client:
         kwargs = {}
 
@@ -89,13 +91,13 @@ class SessionFactory:
         )
 
         client_type_map = {
-            'requests': RequestsClient,
-            'tls': TLSClient,
+            "requests": RequestsClient,
+            "tls": TLSClient,
         }
         client = client_type_map[client_type](
             no_middleware=no_middleware,
             use_mitm_when_active=use_mitm_when_active,
-            **kwargs
+            **kwargs,
         )
 
         return client

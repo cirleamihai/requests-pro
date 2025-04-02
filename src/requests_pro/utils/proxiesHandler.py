@@ -19,11 +19,13 @@ class ProxiesHandler:
         Returns:
             list: A list of proxy strings loaded from the file.
         """
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             txt_content = file.readlines()
             proxies = []
             for raw_proxy in txt_content:
-                proxy = raw_proxy.strip()  # Remove newline and any surrounding whitespace
+                proxy = (
+                    raw_proxy.strip()
+                )  # Remove newline and any surrounding whitespace
                 if proxy:
                     proxies.append(proxy)
 
@@ -59,10 +61,15 @@ class ProxiesHandler:
         proxies = ProxiesHandler._load_proxies(filename=filename)
 
         # Then return a list of processed proxies
-        return [ProxiesHandler.get_proxy(proxy=proxy, filename=filename) for proxy in proxies]
+        return [
+            ProxiesHandler.get_proxy(proxy=proxy, filename=filename)
+            for proxy in proxies
+        ]
 
     @staticmethod
-    def get_proxy(index: int = -1, proxy: str = None, filename: str = "proxies.txt") -> str:
+    def get_proxy(
+        index: int = -1, proxy: str = None, filename: str = "proxies.txt"
+    ) -> str:
         """
         Returns a formatted proxy string in the form 'http://domain:port[@username:password]'.
 
@@ -84,15 +91,15 @@ class ProxiesHandler:
         proxies_components = proxy.split(":")
         domain = proxies_components[0]
         port = proxies_components[1]
-        user_pass = ''
+        user_pass = ""
 
         if len(proxies_components) > 2:
             username = proxies_components[2]
             password = proxies_components[3]
-            user_pass += f'{username}:{password}@'
+            user_pass += f"{username}:{password}@"
 
         # Create the proxy URL
-        proxy = f'http://{user_pass}{domain}:{port}'
+        proxy = f"http://{user_pass}{domain}:{port}"
         return proxy
 
     @staticmethod
@@ -113,10 +120,7 @@ class ProxiesHandler:
         if not proxy_str:
             return {}
 
-        return {
-            'http': proxy_str,
-            'https': proxy_str
-        }
+        return {"http": proxy_str, "https": proxy_str}
 
     @staticmethod
     def formatted_to_raw_proxy(proxy: str | dict):
@@ -130,22 +134,22 @@ class ProxiesHandler:
             str: The raw proxy string.
         """
         if isinstance(proxy, dict):
-            if 'http' not in proxy or 'https' not in proxy:
+            if "http" not in proxy or "https" not in proxy:
                 return ""
 
-            proxy = proxy['http']
+            proxy = proxy["http"]
 
-        if not proxy.startswith('http://'):
+        if not proxy.startswith("http://"):
             return ""
 
-        proxy = proxy.replace('http://', '')
-        tokens = proxy.split('@')
+        proxy = proxy.replace("http://", "")
+        tokens = proxy.split("@")
         if len(tokens) == 1:
             return tokens[0]
 
-        domain = tokens[1].split(':')[0]
-        port = tokens[1].split(':')[1]
-        user = tokens[0].split(':')[0]
-        password = tokens[0].split(':')[1]
+        domain = tokens[1].split(":")[0]
+        port = tokens[1].split(":")[1]
+        user = tokens[0].split(":")[0]
+        password = tokens[0].split(":")[1]
 
-        return f'{domain}:{port}:{user}:{password}'
+        return f"{domain}:{port}:{user}:{password}"

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from http.cookiejar import Cookie
-from typing import Optional, Any, Unpack, TypedDict, Callable
+from typing import Any, Callable, Optional, TypedDict, Unpack
 
 from response import Response
 from utils.headerTools import HeaderHelper
@@ -65,7 +65,12 @@ class Client(ABC):
         pass
 
     @abstractmethod
-    def reset_client(self, proxies: dict = None, proxy_filename_path: str = "", use_proxies: bool = True):
+    def reset_client(
+        self,
+        proxies: dict = None,
+        proxy_filename_path: str = "",
+        use_proxies: bool = True,
+    ):
         """
         The function is responsible for resetting the client session to its initial
         state. It has two possible ways of resetting the client session:
@@ -95,16 +100,16 @@ class Client(ABC):
 
     @abstractmethod
     def request(
-            self,
-            method: str,
-            url: str,
-            params: Optional[dict[str, Any]] = None,
-            data: Optional[Any] = None,
-            headers: Optional[dict[str, str]] = None,
-            cookies: Optional[dict[str, str]] = None,
-            json: Optional[Any] = None,
-            timeout: Optional[float] = None,
-            proxies: Optional[dict[str, str]] = None,
+        self,
+        method: str,
+        url: str,
+        params: Optional[dict[str, Any]] = None,
+        data: Optional[Any] = None,
+        headers: Optional[dict[str, str]] = None,
+        cookies: Optional[dict[str, str]] = None,
+        json: Optional[Any] = None,
+        timeout: Optional[float] = None,
+        proxies: Optional[dict[str, str]] = None,
     ) -> Response:
         pass
 
@@ -267,9 +272,9 @@ class Client(ABC):
             return
 
         if isinstance(new_proxies, str):
-            new_proxies = {'http': new_proxies, 'https': new_proxies}
+            new_proxies = {"http": new_proxies, "https": new_proxies}
 
-        if not new_proxies.get('http') and not new_proxies.get('https'):
+        if not new_proxies.get("http") and not new_proxies.get("https"):
             raise ValueError("Proxies must contain an http and https key")
 
         self.session.proxies = new_proxies
@@ -299,23 +304,23 @@ class Client(ABC):
         cookies_list = []
         for cookie in self.cookies:
             cookie_dict = {
-                'name': cookie.name,
-                'value': cookie.value,
-                'domain': cookie.domain,
-                'path': cookie.path,
-                'expires': cookie.expires,
-                'secure': cookie.secure,
-                'rest': cookie._rest,
-                'version': cookie.version,
-                'port': cookie.port,
-                'port_specified': cookie.port_specified,
-                'domain_specified': cookie.domain_specified,
-                'domain_initial_dot': cookie.domain_initial_dot,
-                'path_specified': cookie.path_specified,
-                'discard': cookie.discard,
-                'comment': cookie.comment,
-                'comment_url': cookie.comment_url,
-                'rfc2109': cookie.rfc2109,
+                "name": cookie.name,
+                "value": cookie.value,
+                "domain": cookie.domain,
+                "path": cookie.path,
+                "expires": cookie.expires,
+                "secure": cookie.secure,
+                "rest": cookie._rest,
+                "version": cookie.version,
+                "port": cookie.port,
+                "port_specified": cookie.port_specified,
+                "domain_specified": cookie.domain_specified,
+                "domain_initial_dot": cookie.domain_initial_dot,
+                "path_specified": cookie.path_specified,
+                "discard": cookie.discard,
+                "comment": cookie.comment,
+                "comment_url": cookie.comment_url,
+                "rfc2109": cookie.rfc2109,
             }
             cookies_list.append(cookie_dict)
         return cookies_list
@@ -324,23 +329,23 @@ class Client(ABC):
         """Deserialize cookies from a list of dictionaries."""
         for cookie_dict in cookies_list:
             cookie = Cookie(
-                version=cookie_dict.get('version', 0),
-                name=cookie_dict['name'],
-                value=cookie_dict['value'],
-                port=cookie_dict.get('port'),
-                port_specified=cookie_dict.get('port_specified', False),
-                domain=cookie_dict.get('domain', ''),
-                domain_specified=cookie_dict.get('domain_specified', False),
-                domain_initial_dot=cookie_dict.get('domain_initial_dot', False),
-                path=cookie_dict.get('path', ''),
-                path_specified=cookie_dict.get('path_specified', False),
-                secure=cookie_dict.get('secure', False),
-                expires=cookie_dict.get('expires'),
-                discard=cookie_dict.get('discard', False),
-                comment=cookie_dict.get('comment'),
-                comment_url=cookie_dict.get('comment_url'),
-                rest=cookie_dict.get('rest', {}),
-                rfc2109=cookie_dict.get('rfc2109', False),
+                version=cookie_dict.get("version", 0),
+                name=cookie_dict["name"],
+                value=cookie_dict["value"],
+                port=cookie_dict.get("port"),
+                port_specified=cookie_dict.get("port_specified", False),
+                domain=cookie_dict.get("domain", ""),
+                domain_specified=cookie_dict.get("domain_specified", False),
+                domain_initial_dot=cookie_dict.get("domain_initial_dot", False),
+                path=cookie_dict.get("path", ""),
+                path_specified=cookie_dict.get("path_specified", False),
+                secure=cookie_dict.get("secure", False),
+                expires=cookie_dict.get("expires"),
+                discard=cookie_dict.get("discard", False),
+                comment=cookie_dict.get("comment"),
+                comment_url=cookie_dict.get("comment_url"),
+                rest=cookie_dict.get("rest", {}),
+                rfc2109=cookie_dict.get("rfc2109", False),
             )
             self.cookies.set_cookie(cookie)
 
@@ -349,7 +354,9 @@ class Client(ABC):
         if self.proxies:
             retries = 0
             while not proxies and retries < 10:
-                proxies = new_proxy or ProxiesHandler.get_proxy(filename=proxy_filename_path)
+                proxies = new_proxy or ProxiesHandler.get_proxy(
+                    filename=proxy_filename_path
+                )
                 retries += 1
 
             self.proxies = proxies
