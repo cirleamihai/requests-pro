@@ -192,7 +192,6 @@ class MiddlewareClient(Client, ABC):
 
                 # Check for redirects
                 url, redirected = self._check_for_redirects(response, url)
-                print(url, "is redirected: ", redirected)
 
                 if not skip_status_check:
                     self.check_response_status(response, custom_status_handling_function, statuses_to_skip)
