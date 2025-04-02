@@ -38,6 +38,7 @@
 
 from tlsClient import TLSClient
 from requestsClient import RequestsClient
+from middlewareClient import MiddlewareClient
 
 from sessionFactory import SessionFactory
 
