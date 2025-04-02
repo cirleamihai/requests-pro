@@ -16,6 +16,7 @@ It's main focus is to provide flexibility in development processes and to improv
 
 - **Everything in [`requests`](https://github.com/psf/requests) and [`python-tls-client`](https://github.com/FlorianREGAZ/Python-Tls-Client)**
 - **Multiple Client Support:** Choose between a standard `RequestsClient` or a custom `TLSClient` for TLS-encrypted requests.
+- **Easy new clients integration which facilitates fast scalability**
 - **Middleware Support:** Customize behavior with middleware that handles retries, redirects, and status code validation for each request and thus, deal with exception status in case something goes wrong.
 - **Dynamic Header Generation:** Automatically generate and rotate realistic headers (including User-Agent, Accept-Language, etc.) that persist throughout the entire life of a session.
 - **Proxy Handling:** Support for proxies via direct configuration or file-based random proxy selection.
@@ -33,6 +34,7 @@ print(client.headers)  # Already contains more than 6 preset headers, with a ran
 resp = client.get("https://httpbin.org/get")  # Will automatically retry if the request fails, logging the error
 print(resp.status_code)
 ```
+### Broad examples on how to use the library can be found in the [`examples.py`](https://github.com/cirleamihai/requests-pro/blob/main/src/requests_pro/examples.py) file
 
 ## Implementing your own Client
 ```py
