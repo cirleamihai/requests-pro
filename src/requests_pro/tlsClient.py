@@ -26,7 +26,7 @@ def kwargs_processing(func):
         if 'verify' in kwargs:
             kwargs['insecure_skip_verify'] = not kwargs.pop('verify')
 
-            if is_charles_running():
+            if (kwargs.pop('use_mitm_when_active', self.use_mitm_when_active)) and is_charles_running():
                 kwargs['proxy'] = {
                     "http": "http://127.0.0.1:8888",
                     "https": "http://127.0.0.1:8888",
