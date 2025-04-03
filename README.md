@@ -1,6 +1,6 @@
 # requests_pro
 
-## **requests_pro** is a robust, flexible HTTP client library that defines an API similar to the popular `requests` module. Wraps up multiple client implementations such that one can change between them without changing the underlying code.
+## **requests_pro** is a robust, flexible HTTP client library that defines an API similar to the popular [`requests`](https://github.com/psf/requests) module. Wraps up multiple client implementations such that one can change between them without changing the underlying code.
 
 It's main focus is to provide flexibility in development processes and to improve code reusability. It simplifies making HTTP requests with advanced features like **automatic header generation**, **middleware for error handling**, **proxy management**, **advanced TLS configurations**, and **persistent sessions**. This package is ideal for projects that require realistic browser-like requests and fine-grained control over connection parameters, but without the overhead and memory usage of a browser.
 
@@ -34,7 +34,7 @@ print(client.headers)  # Already contains more than 6 preset headers, with a ran
 resp = client.get("https://httpbin.org/get")  # Will automatically retry if the request fails, logging the error
 print(resp.status_code)
 ```
-### Broad examples on how to use the library can be found in the [`examples.py`](https://github.com/cirleamihai/requests-pro/blob/main/src/requests_pro/examples.py) file
+### Broader examples on how to use the library can be found in the [`examples.py`](https://github.com/cirleamihai/requests-pro/blob/main/src/requests_pro/examples.py) file
 
 ## Implementing your own Client
 ```py
@@ -43,6 +43,33 @@ from requests_pro import MiddlewareClient
 
 class MyOwnClient(MiddlewareClient):
   pass  #  <- make sure to implement every abstract method of it
+```
+
+## Advanced Usage
+```py
+client = TLSClient()
+
+response = client.get("https://httpbin.org/redirect/2", middl_skip_redirects=True)
+print(response.status_code)  # Will print 302
+
+response = client.get(
+    "https://httpbin.org/redirect/5",
+    middl_redirect_endpoint_contains_stop="redirect/2",
+)
+# This will stop once it reaches the endpoint that contains redirect/2
+# Moreover, it will auto handle errors that you encounter
+# along the way, such as timeouts, bad proxies, and many more.
+
+# The request flow goes like this:
+# New location: https://httpbin.org/relative-redirect/4  <- Redirect 1
+# New location: https://httpbin.org/relative-redirect/3  <- Redirect 2
+# New location: https://httpbin.org/relative-redirect/2  <- This is where it stops, because it contains the substr
+
+# Or if you know the exact endpoint to stop at, you can give it like this:
+response = client.get(
+    "https://httpbin.org/redirect/5",
+    middl_redirect_endpoint_stop="https://httpbin.org/relative-redirect/1",
+)
 ```
 
 ## Installation
