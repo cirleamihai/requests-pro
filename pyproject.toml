@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "requests-pro"
+version = "0.1.0"
+description = "An elegant HTTP/s Client library that helps you scale much better than requests"
+authors = [{ name = "Cirlea Mihai", email = "alexcirlea@hotmail.com" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "requests>=2.32.3",
+    "urllib3>=2.3.0",
+    "tls-client>=1.0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/cirleamihai/requests-pro"
+
+[tool.setuptools.packages.find]
+where = ["src"]
